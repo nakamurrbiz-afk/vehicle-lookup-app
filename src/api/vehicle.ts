@@ -27,15 +27,20 @@ export async function lookupVehicle(plate: string, country: string): Promise<Loo
 export interface CarImage { url: string; alt: string; source: string; }
 export interface ListingLink {
   id: string; site: string; flag: string;
-  url: string; cta: string; color: string; minPrice: string | null;
+  url: string; affiliateUrl: string | null;
+  cta: string; color: string; minPrice: string | null;
 }
 export interface MediaResult { image: CarImage; listings: ListingLink[]; }
 
 export async function fetchVehicleMedia(
-  make: string, model: string, year: number | null,
-  country: string, postcode?: string,
+  make: string,
+  model: string | null,
+  year: number | null,
+  country: string,
+  postcode?: string,
 ): Promise<MediaResult | null> {
-  const p = new URLSearchParams({ make, model, country });
+  const p = new URLSearchParams({ make, country });
+  if (model)    p.set('model',    model);
   if (year)     p.set('year',     String(year));
   if (postcode) p.set('postcode', postcode);
   try {

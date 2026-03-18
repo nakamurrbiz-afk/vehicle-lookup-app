@@ -30,9 +30,12 @@ export function VehicleCard({ data, postcode }: Props) {
   };
 
   useEffect(() => {
-    if (!data.make && !data.model) return;
-    fetchVehicleMedia(data.make ?? '', data.model ?? '', data.year, data.country, postcode)
-      .then((r) => { if (r) { setImage(r.image); setListings(r.listings); } });
+    if (!data.make) return;
+    fetchVehicleMedia(data.make, data.model, data.year, data.country, postcode)
+      .then((r) => {
+        if (r) { setImage(r.image); setListings(r.listings); }
+        else   { setListings([]); }  // show "no listings" rather than skeleton forever
+      });
   }, [data, postcode]);
 
   return (
@@ -114,7 +117,7 @@ export function VehicleCard({ data, postcode }: Props) {
               <TouchableOpacity
                 key={l.id}
                 style={styles.listingBtn}
-                onPress={() => Linking.openURL(l.url)}
+                onPress={() => Linking.openURL(l.affiliateUrl ?? l.url)}
                 activeOpacity={0.75}
               >
                 <Text style={styles.listingFlag}>{l.flag}</Text>
