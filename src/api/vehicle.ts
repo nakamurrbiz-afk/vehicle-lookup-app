@@ -3,11 +3,22 @@
 // For iOS simulator: http://localhost:3000
 export const API_BASE_URL = 'http://localhost:3000';
 
+export interface MileageRecord { date: string; mileage: number; passed: boolean; }
+export interface RunningCost { fuelPerYear: string; totalPerYear: string; perMile: string; source: string; }
+export interface InsuranceGroup { min: number; max: number; label: string; }
+
 export interface VehicleResult {
   plate: string; country: string;
   make: string | null; model: string | null; year: number | null;
   colour: string | null; fuelType: string | null;
   vin: string | null; engineSize: number | null;
+  co2Emissions: number | null;
+  mileageHistory: MileageRecord[];
+  commonFailures: string[];
+  runningCost: RunningCost | null;
+  euroncapStars: number | null;
+  insuranceGroup: InsuranceGroup | null;
+  popularityCount: number;
   source: string; cachedAt: string | null;
 }
 
@@ -30,7 +41,11 @@ export interface ListingLink {
   url: string; affiliateUrl: string | null;
   cta: string; color: string; minPrice: string | null;
 }
-export interface MediaResult { image: CarImage; listings: ListingLink[]; }
+export interface PriceSummary {
+  new:  { from: string; to: string; note?: string; source: string } | null;
+  used: { from: string; source: string } | null;
+}
+export interface MediaResult { image: CarImage; listings: ListingLink[]; prices: PriceSummary; }
 
 export async function fetchVehicleMedia(
   make: string,
