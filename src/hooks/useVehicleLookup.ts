@@ -10,10 +10,10 @@ type State =
 export function useVehicleLookup() {
   const [state, setState] = useState<State>({ status: 'idle' });
 
-  async function lookup(plate: string, country: string) {
+  async function lookup(plate: string, country: string, state?: string) {
     setState({ status: 'loading' });
     try {
-      const result = await lookupVehicle(plate, country);
+      const result = await lookupVehicle(plate, country, state);
       if (result.ok) {
         setState({ status: 'success', data: result.data });
       } else {

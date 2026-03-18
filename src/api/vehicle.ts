@@ -20,6 +20,11 @@ export interface VehicleResult {
   insuranceGroup: InsuranceGroup | null;
   popularityCount: number;
   source: string; cachedAt: string | null;
+  // US-specific
+  recallCount: number | null;
+  nhtsaSafetyRating: number | null;
+  mpgCity: number | null;
+  mpgHighway: number | null;
 }
 
 export interface ApiError { status: number; title: string; detail: string; }
@@ -28,8 +33,10 @@ export type LookupResult =
   | { ok: true;  data:  VehicleResult }
   | { ok: false; error: ApiError };
 
-export async function lookupVehicle(plate: string, country: string): Promise<LookupResult> {
-  const url = `${API_BASE_URL}/v1/lookup?plate=${encodeURIComponent(plate)}&country=${encodeURIComponent(country)}`;
+export async function lookupVehicle(plate: string, country: string, state?: string): Promise<LookupResult> {
+  const p = new URLSearchParams({ plate, country });
+  if (state) p.set('state', state);
+  const url = `${API_BASE_URL}/v1/lookup?${p}`;
   const res = await fetch(url, { headers: { Accept: 'application/json' } });
   const body = await res.json();
   return res.ok ? { ok: true, data: body } : { ok: false, error: body };

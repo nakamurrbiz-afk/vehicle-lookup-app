@@ -13,9 +13,19 @@ import { ErrorCard } from '../components/ErrorCard';
 import { useVehicleLookup } from '../hooks/useVehicleLookup';
 import { colors, spacing, radius, font } from '../theme';
 
+const US_STATES = [
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
+  'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+  'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+  'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY',
+  'DC',
+];
+
 export function LookupScreen() {
   const [plate,    setPlate]    = useState('');
   const [country,  setCountry]  = useState('GB');
+  const [usState,  setUsState]  = useState('CA');
   const [postcode, setPostcode] = useState('');
   const [locating, setLocating] = useState(false);
   const [locMsg,   setLocMsg]   = useState<{ text: string; ok: boolean } | null>(null);
@@ -27,7 +37,7 @@ export function LookupScreen() {
   }
 
   function handleSearch() {
-    if (plate.trim().length >= 2) lookup(plate, country);
+    if (plate.trim().length >= 2) lookup(plate, country, country === 'US' ? usState : undefined);
   }
 
   async function detectLocation() {
@@ -110,6 +120,23 @@ export function LookupScreen() {
               <CountrySelector selected={country} onChange={handleCountryChange} />
             </View>
 
+            {country === 'US' && (
+              <View>
+                <Text style={styles.lbl}>State</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.stateScroll} contentContainerStyle={styles.stateRow}>
+                  {US_STATES.map(s => (
+                    <TouchableOpacity
+                      key={s}
+                      style={[styles.stateChip, usState === s && styles.stateChipActive]}
+                      onPress={() => setUsState(s)}
+                    >
+                      <Text style={[styles.stateChipTxt, usState === s && styles.stateChipTxtActive]}>{s}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+
             <View>
               <Text style={styles.lbl}>License Plate</Text>
               <PlateInput value={plate} onChange={setPlate} country={country} />
@@ -186,7 +213,7 @@ export function LookupScreen() {
           )}
 
           {state.status === 'error' && (
-            <ErrorCard error={state.error} onRetry={() => lookup(plate, country)} />
+            <ErrorCard error={state.error} onRetry={() => lookup(plate, country, country === 'US' ? usState : undefined)} />
           )}
 
         </ScrollView>
@@ -221,4 +248,10 @@ const styles = StyleSheet.create({
   searchBtnTxtOff: { color: colors.t4, fontSize: font.sizes.sm },
   resultBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
   clearTxt:  { fontSize: font.sizes.sm, color: colors.t3 },
+  stateScroll:     { marginHorizontal: -spacing.xs },
+  stateRow:        { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing.xs },
+  stateChip:       { paddingHorizontal: spacing.sm, paddingVertical: 6, borderRadius: radius.full, borderWidth: 1, borderColor: colors.border, backgroundColor: 'rgba(255,255,255,0.05)' },
+  stateChipActive: { backgroundColor: colors.blue, borderColor: colors.blue },
+  stateChipTxt:    { fontSize: font.sizes.xs, fontWeight: font.weights.semibold, color: colors.t3, letterSpacing: 0.5 },
+  stateChipTxtActive: { color: '#fff' },
 });

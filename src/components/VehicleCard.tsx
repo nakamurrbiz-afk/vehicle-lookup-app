@@ -175,6 +175,56 @@ export function VehicleCard({ data, postcode }: Props) {
         </View>
       )}
 
+      {/* ── US: NHTSA Safety Rating ── */}
+      {data.country === 'US' && data.nhtsaSafetyRating != null && (
+        <View style={styles.section}>
+          <SectionLabel label="Safety — NHTSA Overall Rating" />
+          <View style={styles.ncapRow}>
+            <StarRating stars={data.nhtsaSafetyRating} />
+            <Text style={styles.ncapLabel}>{data.nhtsaSafetyRating} / 5 stars</Text>
+          </View>
+          <Text style={styles.sourceNote}>Source: nhtsa.gov (model-level)</Text>
+        </View>
+      )}
+
+      {/* ── US: Recalls ── */}
+      {data.country === 'US' && data.recallCount != null && (
+        <View style={styles.section}>
+          <SectionLabel label="NHTSA Recalls" />
+          <View style={styles.ncapRow}>
+            <Text style={[styles.insGroup, { color: data.recallCount > 0 ? colors.yellow : colors.green }]}>
+              {data.recallCount}
+            </Text>
+            <Text style={styles.ncapLabel}> active recall{data.recallCount !== 1 ? 's' : ''}</Text>
+          </View>
+          <Text style={styles.sourceNote}>Source: api.nhtsa.gov/recalls</Text>
+        </View>
+      )}
+
+      {/* ── US: EPA Fuel Economy ── */}
+      {data.country === 'US' && (data.mpgCity != null || data.mpgHighway != null) && (
+        <View style={styles.section}>
+          <SectionLabel label="EPA Fuel Economy" />
+          <View style={styles.priceGrid}>
+            {data.mpgCity != null && (
+              <View style={styles.pricePanel}>
+                <Text style={styles.pricePanelLabel}>City</Text>
+                <Text style={styles.pricePanelValue}>{data.mpgCity}</Text>
+                <Text style={styles.pricePanelRange}>MPG</Text>
+              </View>
+            )}
+            {data.mpgHighway != null && (
+              <View style={[styles.pricePanel, styles.pricePanelUsed]}>
+                <Text style={styles.pricePanelLabel}>Highway</Text>
+                <Text style={[styles.pricePanelValue, styles.pricePanelValueUsed]}>{data.mpgHighway}</Text>
+                <Text style={styles.pricePanelRange}>MPG</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.sourceNote}>Source: fueleconomy.gov (EPA estimate)</Text>
+        </View>
+      )}
+
       {/* ── Price summary ── */}
       {(prices?.new || prices?.used) && (
         <View style={styles.section}>
