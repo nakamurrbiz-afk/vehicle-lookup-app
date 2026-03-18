@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, Image, StyleSheet, TouchableOpacity, Linking, ActivityIndicator,
+  View, Text, Image, StyleSheet, TouchableOpacity, Linking, ActivityIndicator, Platform,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { VehicleResult, ListingLink, fetchVehicleMedia, CarImage } from '../api/vehicle';
@@ -117,7 +117,16 @@ export function VehicleCard({ data, postcode }: Props) {
               <TouchableOpacity
                 key={l.id}
                 style={styles.listingBtn}
-                onPress={() => Linking.openURL(l.affiliateUrl ?? l.url)}
+                onPress={() => {
+                  const target = l.affiliateUrl ?? l.url;
+                  if (Platform.OS === 'web') {
+                    // Linking.openURL uses window.open() which popup blockers intercept on web.
+                    // Directly calling window.open preserves the user-gesture context.
+                    (window as any).open(target, '_blank', 'noopener,noreferrer');
+                  } else {
+                    Linking.openURL(target);
+                  }
+                }}
                 activeOpacity={0.75}
               >
                 <Text style={styles.listingFlag}>{l.flag}</Text>
