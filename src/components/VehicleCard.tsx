@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, Image, StyleSheet, TouchableOpacity, Linking, ActivityIndicator, Platform,
+  View, Text, Image, StyleSheet, TouchableOpacity, Linking, ActivityIndicator,
+  Platform, ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import {
@@ -11,7 +12,36 @@ import { colors, spacing, radius, font } from '../theme';
 
 interface Props { data: VehicleResult; postcode?: string; }
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ── Color name → approximate hex ───────────────────────────────────────────
+const COLOUR_MAP: Record<string, string> = {
+  'WHITE':        '#F0F0F0',
+  'BLACK':        '#1A1A1A',
+  'SILVER':       '#C0C0C0',
+  'GREY':         '#808080',
+  'GRAY':         '#808080',
+  'BLUE':         '#1565C0',
+  'DARK BLUE':    '#0D2B6E',
+  'LIGHT BLUE':   '#64B5F6',
+  'NAVY':         '#0D2B6E',
+  'RED':          '#C62828',
+  'DARK RED':     '#7B1818',
+  'GREEN':        '#2E7D32',
+  'DARK GREEN':   '#1B5E20',
+  'YELLOW':       '#F9A825',
+  'ORANGE':       '#E65100',
+  'BROWN':        '#5D4037',
+  'BEIGE':        '#D7CCC8',
+  'CREAM':        '#FFF8E1',
+  'GOLD':         '#FFC107',
+  'BRONZE':       '#CD7F32',
+  'PURPLE':       '#6A1B9A',
+  'MAROON':       '#880E4F',
+  'PINK':         '#F48FB1',
+  'TURQUOISE':    '#00897B',
+  'BRONZE':       '#CD7F32',
+};
+
+// ── Helpers ─────────────────────────────────────────────────────────────────
 
 function StarRating({ stars }: { stars: number }) {
   return (
@@ -37,6 +67,28 @@ function SpecRow({ label, value, sub }: { label: string; value: string; sub?: st
   );
 }
 
+function ColourRow({ colour }: { colour: string }) {
+  const hex = COLOUR_MAP[colour.toUpperCase()] ?? null;
+  return (
+    <View style={styles.specRow}>
+      <Text style={styles.specRowLabel}>Colour</Text>
+      <View style={styles.specRowRight}>
+        <View style={styles.colourValueRow}>
+          {hex && (
+            <View style={[
+              styles.colourSwatch,
+              { backgroundColor: hex },
+              hex === '#F0F0F0' || hex === '#FFF8E1' || hex === '#F0F0F0'
+                ? styles.colourSwatchLight : null,
+            ]} />
+          )}
+          <Text style={styles.specRowValue}>{colour}</Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 function MileageBar({ records }: { records: MileageRecord[] }) {
   if (records.length === 0) return null;
   const max = Math.max(...records.map(r => r.mileage));
@@ -47,7 +99,11 @@ function MileageBar({ records }: { records: MileageRecord[] }) {
         return (
           <View key={i} style={styles.mileageCol}>
             <View style={styles.mileageBarBg}>
-              <View style={[styles.mileageBarFill, { height: `${Math.round(pct * 100)}%` as any, backgroundColor: r.passed ? colors.green : colors.red }]} />
+              <View style={[
+                styles.mileageBarFill,
+                { height: `${Math.round(pct * 100)}%` as any,
+                  backgroundColor: r.passed ? colors.green : colors.red },
+              ]} />
             </View>
             <Text style={styles.mileageYear}>{r.date.slice(0, 4)}</Text>
             <Text style={styles.mileageMi}>{(r.mileage / 1000).toFixed(0)}k</Text>
@@ -58,21 +114,22 @@ function MileageBar({ records }: { records: MileageRecord[] }) {
   );
 }
 
-// ── Component ──────────────────────────────────────────────────────────────
+// ── Component ───────────────────────────────────────────────────────────────
 
 export function VehicleCard({ data, postcode }: Props) {
-  const [image, setImage]         = useState<CarImage | null>(null);
-  const [listings, setListings]   = useState<ListingLink[] | null>(null);
-  const [prices, setPrices]       = useState<PriceSummary | null>(null);
-  const [imgLoaded, setImgLoaded] = useState(false);
+  const [images,   setImages]   = useState<CarImage[]>([]);
+  const [listings, setListings] = useState<ListingLink[] | null>(null);
+  const [prices,   setPrices]   = useState<PriceSummary | null>(null);
+  const [imgIndex, setImgIndex] = useState(0);
+  const [heroWidth, setHeroWidth] = useState(0);
 
-  const name = [data.make, data.model].filter(Boolean).join(' ') || 'Unknown Vehicle';
+  const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!data.make) return;
     fetchVehicleMedia(data.make, data.model, data.year, data.country, postcode)
       .then((r) => {
-        if (r) { setImage(r.image); setListings(r.listings); setPrices(r.prices); }
+        if (r) { setImages(r.images ?? []); setListings(r.listings); setPrices(r.prices); }
         else   { setListings([]); }
       });
   }, [data, postcode]);
@@ -81,32 +138,55 @@ export function VehicleCard({ data, postcode }: Props) {
     ? data.mileageHistory[data.mileageHistory.length - 1].mileage
     : null;
 
+  const hasImages = images.length > 0;
+
   return (
     <View style={styles.card}>
 
-      {/* ── Hero image ── */}
-      <View style={styles.hero}>
-        {image?.url ? (
-          <Image
-            source={{ uri: image.url }}
-            style={styles.heroImg}
-            resizeMode="cover"
-            onLoad={() => setImgLoaded(true)}
-          />
-        ) : null}
-        {!imgLoaded && (
+      {/* ── Hero image carousel ── */}
+      <View
+        style={styles.hero}
+        onLayout={e => setHeroWidth(e.nativeEvent.layout.width)}
+      >
+        {hasImages && heroWidth > 0 ? (
+          <ScrollView
+            ref={scrollRef}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            style={StyleSheet.absoluteFill}
+            onMomentumScrollEnd={e => {
+              const x = e.nativeEvent.contentOffset.x;
+              setImgIndex(Math.round(x / heroWidth));
+            }}
+          >
+            {images.map((img, i) => (
+              <Image
+                key={i}
+                source={{ uri: img.url }}
+                style={[styles.heroImg, { width: heroWidth }]}
+                resizeMode="cover"
+              />
+            ))}
+          </ScrollView>
+        ) : (
           <View style={styles.heroPh}>
-            {image?.url
+            {hasImages
               ? <ActivityIndicator color={colors.blue} />
               : <Text style={styles.heroPhIcon}>🚗</Text>}
           </View>
         )}
+
+        {/* Gradient overlay (non-interactive) */}
         <LinearGradient
           colors={['transparent', 'transparent', 'rgba(7,12,26,0.55)', 'rgba(7,12,26,0.96)']}
           locations={[0, 0.45, 0.75, 1]}
           style={StyleSheet.absoluteFill}
+          pointerEvents="none"
         />
-        <View style={styles.heroTitle}>
+
+        {/* Title */}
+        <View style={styles.heroTitle} pointerEvents="none">
           {data.make && (
             <Text style={styles.heroMake}>{data.make.toUpperCase()}</Text>
           )}
@@ -117,21 +197,32 @@ export function VehicleCard({ data, postcode }: Props) {
             <Text style={styles.heroYear}>{data.year}</Text>
           )}
         </View>
+
+        {/* Dot indicators */}
+        {images.length > 1 && (
+          <View style={styles.dots} pointerEvents="none">
+            {images.map((_, i) => (
+              <View key={i} style={[styles.dot, i === imgIndex && styles.dotActive]} />
+            ))}
+          </View>
+        )}
+
         {/* Popularity badge */}
         {data.popularityCount > 1 && (
           <View style={styles.popularityBadge}>
             <Text style={styles.popularityTxt}>🔍 {data.popularityCount} lookups</Text>
           </View>
         )}
-        {image?.source === 'unsplash' && (
-          <Text style={styles.credit}>Photos by Unsplash</Text>
+
+        {images.some(img => img.source === 'unsplash') && (
+          <Text style={styles.credit} pointerEvents="none">Photos by Unsplash</Text>
         )}
       </View>
 
       {/* ── Quick specs ── */}
       <View style={styles.section}>
         <SectionLabel label="Vehicle Details" />
-        {data.colour    && <SpecRow label="Colour"      value={data.colour} />}
+        {data.colour    && <ColourRow colour={data.colour} />}
         {data.fuelType  && <SpecRow label="Fuel"        value={data.fuelType} />}
         {data.engineSize != null && (
           <SpecRow label="Engine" value={`${data.engineSize} cc`} />
@@ -353,15 +444,29 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.05)',
   },
 
-  // Hero
-  hero:         { width: '100%', height: 240, backgroundColor: '#0D1530' },
-  heroImg:      { ...StyleSheet.absoluteFillObject, resizeMode: 'cover' },
-  heroPh:       { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
-  heroPhIcon:   { fontSize: 40, opacity: 0.15 },
-  heroTitle:    { position: 'absolute', bottom: 0, left: 0, right: 0, padding: spacing.lg, paddingBottom: spacing.md },
-  heroMake:     { fontSize: font.sizes.xs, fontWeight: font.weights.bold, color: 'rgba(255,255,255,0.55)', letterSpacing: 2, marginBottom: 2 },
-  heroModel:    { fontSize: font.sizes.xxl, fontWeight: font.weights.extrabold, color: colors.t1, letterSpacing: -0.5, lineHeight: 30 },
-  heroYear:     { fontSize: font.sizes.sm, color: 'rgba(255,255,255,0.5)', marginTop: 4 },
+  // Hero / carousel
+  hero:       { width: '100%', height: 240, backgroundColor: '#0D1530' },
+  heroImg:    { height: 240, resizeMode: 'cover' },
+  heroPh:     { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  heroPhIcon: { fontSize: 40, opacity: 0.15 },
+  heroTitle:  { position: 'absolute', bottom: 0, left: 0, right: 0, padding: spacing.lg, paddingBottom: spacing.md },
+  heroMake:   { fontSize: font.sizes.xs, fontWeight: font.weights.bold, color: 'rgba(255,255,255,0.55)', letterSpacing: 2, marginBottom: 2 },
+  heroModel:  { fontSize: font.sizes.xxl, fontWeight: font.weights.extrabold, color: colors.t1, letterSpacing: -0.5, lineHeight: 30 },
+  heroYear:   { fontSize: font.sizes.sm, color: 'rgba(255,255,255,0.5)', marginTop: 4 },
+
+  // Dot indicators
+  dots: {
+    position: 'absolute', bottom: spacing.md, left: 0, right: 0,
+    flexDirection: 'row', justifyContent: 'center', gap: 5,
+  },
+  dot: {
+    width: 6, height: 6, borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.35)',
+  },
+  dotActive: {
+    backgroundColor: '#fff', width: 18, borderRadius: 3,
+  },
+
   popularityBadge: {
     position: 'absolute', top: spacing.sm, right: spacing.sm,
     backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: radius.full,
@@ -386,6 +491,16 @@ const styles = StyleSheet.create({
   specRowRight:  { alignItems: 'flex-end' },
   specRowValue:  { fontSize: font.sizes.sm, color: colors.t1, fontWeight: font.weights.semibold },
   specRowSub:    { fontSize: 10, color: colors.t4 },
+
+  // Colour swatch
+  colourValueRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  colourSwatch: {
+    width: 16, height: 16, borderRadius: 3,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
+  },
+  colourSwatchLight: {
+    borderColor: 'rgba(0,0,0,0.2)',
+  },
 
   // Euro NCAP
   ncapRow:   { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },

@@ -52,7 +52,7 @@ export interface PriceSummary {
   new:  { from: string; to: string; note?: string; source: string } | null;
   used: { from: string; source: string } | null;
 }
-export interface MediaResult { image: CarImage; listings: ListingLink[]; prices: PriceSummary; }
+export interface MediaResult { images: CarImage[]; listings: ListingLink[]; prices: PriceSummary; }
 
 export async function fetchVehicleMedia(
   make: string,
