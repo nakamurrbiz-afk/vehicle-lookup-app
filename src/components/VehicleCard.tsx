@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, Image, StyleSheet, TouchableOpacity, Linking, ActivityIndicator,
   Platform, ScrollView,
@@ -38,7 +38,6 @@ const COLOUR_MAP: Record<string, string> = {
   'MAROON':       '#880E4F',
   'PINK':         '#F48FB1',
   'TURQUOISE':    '#00897B',
-  'BRONZE':       '#CD7F32',
 };
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -67,21 +66,21 @@ function SpecRow({ label, value, sub }: { label: string; value: string; sub?: st
   );
 }
 
+const LIGHT_COLOURS = new Set(['#F0F0F0', '#FFF8E1', '#D7CCC8', '#F48FB1', '#C0C0C0']);
+
 function ColourRow({ colour }: { colour: string }) {
-  const hex = COLOUR_MAP[colour.toUpperCase()] ?? null;
+  const hex = COLOUR_MAP[colour.toUpperCase()] ?? '#888888';
+  const isLight = LIGHT_COLOURS.has(hex);
   return (
     <View style={styles.specRow}>
       <Text style={styles.specRowLabel}>Colour</Text>
       <View style={styles.specRowRight}>
         <View style={styles.colourValueRow}>
-          {hex && (
-            <View style={[
-              styles.colourSwatch,
-              { backgroundColor: hex },
-              hex === '#F0F0F0' || hex === '#FFF8E1' || hex === '#F0F0F0'
-                ? styles.colourSwatchLight : null,
-            ]} />
-          )}
+          <View style={[
+            styles.colourSwatch,
+            { backgroundColor: hex },
+            isLight ? styles.colourSwatchLight : null,
+          ]} />
           <Text style={styles.specRowValue}>{colour}</Text>
         </View>
       </View>
@@ -117,13 +116,11 @@ function MileageBar({ records }: { records: MileageRecord[] }) {
 // ── Component ───────────────────────────────────────────────────────────────
 
 export function VehicleCard({ data, postcode }: Props) {
-  const [images,   setImages]   = useState<CarImage[]>([]);
-  const [listings, setListings] = useState<ListingLink[] | null>(null);
-  const [prices,   setPrices]   = useState<PriceSummary | null>(null);
-  const [imgIndex, setImgIndex] = useState(0);
+  const [images,    setImages]    = useState<CarImage[]>([]);
+  const [listings,  setListings]  = useState<ListingLink[] | null>(null);
+  const [prices,    setPrices]    = useState<PriceSummary | null>(null);
+  const [imgIndex,  setImgIndex]  = useState(0);
   const [heroWidth, setHeroWidth] = useState(0);
-
-  const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (!data.make) return;
@@ -148,25 +145,29 @@ export function VehicleCard({ data, postcode }: Props) {
         style={styles.hero}
         onLayout={e => setHeroWidth(e.nativeEvent.layout.width)}
       >
+        {/* Images */}
         {hasImages && heroWidth > 0 ? (
           <ScrollView
-            ref={scrollRef}
             horizontal
             pagingEnabled
+            snapToInterval={heroWidth}
+            decelerationRate="fast"
             showsHorizontalScrollIndicator={false}
-            style={StyleSheet.absoluteFill}
-            onMomentumScrollEnd={e => {
+            style={{ width: heroWidth, height: 240 }}
+            scrollEventThrottle={16}
+            onScroll={e => {
               const x = e.nativeEvent.contentOffset.x;
               setImgIndex(Math.round(x / heroWidth));
             }}
           >
             {images.map((img, i) => (
-              <Image
-                key={i}
-                source={{ uri: img.url }}
-                style={[styles.heroImg, { width: heroWidth }]}
-                resizeMode="cover"
-              />
+              <View key={i} style={{ width: heroWidth, height: 240 }}>
+                <Image
+                  source={{ uri: img.url }}
+                  style={{ width: heroWidth, height: 240 }}
+                  resizeMode="cover"
+                />
+              </View>
             ))}
           </ScrollView>
         ) : (
@@ -177,13 +178,14 @@ export function VehicleCard({ data, postcode }: Props) {
           </View>
         )}
 
-        {/* Gradient overlay (non-interactive) */}
-        <LinearGradient
-          colors={['transparent', 'transparent', 'rgba(7,12,26,0.55)', 'rgba(7,12,26,0.96)']}
-          locations={[0, 0.45, 0.75, 1]}
-          style={StyleSheet.absoluteFill}
-          pointerEvents="none"
-        />
+        {/* Gradient overlay */}
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          <LinearGradient
+            colors={['transparent', 'transparent', 'rgba(7,12,26,0.55)', 'rgba(7,12,26,0.96)']}
+            locations={[0, 0.45, 0.75, 1]}
+            style={StyleSheet.absoluteFill}
+          />
+        </View>
 
         {/* Title */}
         <View style={styles.heroTitle} pointerEvents="none">
@@ -445,9 +447,8 @@ const styles = StyleSheet.create({
   },
 
   // Hero / carousel
-  hero:       { width: '100%', height: 240, backgroundColor: '#0D1530' },
-  heroImg:    { height: 240, resizeMode: 'cover' },
-  heroPh:     { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  hero:   { width: '100%', height: 240, backgroundColor: '#0D1530', overflow: 'hidden' },
+  heroPh: { height: 240, alignItems: 'center', justifyContent: 'center' },
   heroPhIcon: { fontSize: 40, opacity: 0.15 },
   heroTitle:  { position: 'absolute', bottom: 0, left: 0, right: 0, padding: spacing.lg, paddingBottom: spacing.md },
   heroMake:   { fontSize: font.sizes.xs, fontWeight: font.weights.bold, color: 'rgba(255,255,255,0.55)', letterSpacing: 2, marginBottom: 2 },
