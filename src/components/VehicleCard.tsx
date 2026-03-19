@@ -86,9 +86,7 @@ function ColourRow({ colour }: { colour: string }) {
           </View>
         </View>
       </View>
-      <Text style={styles.colourNote}>
-        Colour as registered. May differ if the vehicle has been repainted or wrapped.
-      </Text>
+      <Text style={styles.colourNote}>ⓘ May differ if repainted or wrapped</Text>
     </View>
   );
 }
