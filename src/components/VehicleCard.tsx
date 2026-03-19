@@ -72,18 +72,23 @@ function ColourRow({ colour }: { colour: string }) {
   const hex = COLOUR_MAP[colour.toUpperCase()] ?? '#888888';
   const isLight = LIGHT_COLOURS.has(hex);
   return (
-    <View style={styles.specRow}>
-      <Text style={styles.specRowLabel}>Colour</Text>
-      <View style={styles.specRowRight}>
-        <View style={styles.colourValueRow}>
-          <View style={[
-            styles.colourSwatch,
-            { backgroundColor: hex },
-            isLight ? styles.colourSwatchLight : null,
-          ]} />
-          <Text style={styles.specRowValue}>{colour}</Text>
+    <View style={styles.colourRow}>
+      <View style={styles.specRow}>
+        <Text style={styles.specRowLabel}>Registered Colour</Text>
+        <View style={styles.specRowRight}>
+          <View style={styles.colourValueRow}>
+            <View style={[
+              styles.colourSwatch,
+              { backgroundColor: hex },
+              isLight ? styles.colourSwatchLight : null,
+            ]} />
+            <Text style={styles.specRowValue}>{colour}</Text>
+          </View>
         </View>
       </View>
+      <Text style={styles.colourNote}>
+        Colour as registered. May differ if the vehicle has been repainted or wrapped.
+      </Text>
     </View>
   );
 }
@@ -494,6 +499,8 @@ const styles = StyleSheet.create({
   specRowSub:    { fontSize: 10, color: colors.t4 },
 
   // Colour swatch
+  colourRow:      { gap: 3 },
+  colourNote:     { fontSize: 10, color: colors.t4, paddingHorizontal: 2, lineHeight: 14 },
   colourValueRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   colourSwatch: {
     width: 16, height: 16, borderRadius: 3,
