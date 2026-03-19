@@ -5,10 +5,10 @@ import { colors, spacing, radius, font } from '../theme';
 interface Props { value: string; onChange: (v: string) => void; country: string; }
 
 const PLACEHOLDER: Record<string, string> = {
-  GB: 'AB12 CDE', US: '7ABC123', JP: '品川301あ1234',
+  GB: 'AB12 CDE', US: '7ABC123', NL: 'AB-123-C', JP: '品川301あ1234',
 };
 const STRIP_COLOR: Record<string, string> = {
-  GB: '#012169', US: '#B22234', JP: '#1a1a1a',
+  GB: '#012169', US: '#B22234', NL: '#AE1C28', JP: '#1a1a1a',
 };
 
 export function PlateInput({ value, onChange, country }: Props) {

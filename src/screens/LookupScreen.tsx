@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView, StyleSheet,
   ActivityIndicator, KeyboardAvoidingView, Platform,
@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
-import { CountrySelector } from '../components/CountrySelector';
+import { CountrySelector, COUNTRIES } from '../components/CountrySelector';
 import { PlateInput } from '../components/PlateInput';
 import { VehicleCard } from '../components/VehicleCard';
 import { ErrorCard } from '../components/ErrorCard';
@@ -32,6 +32,28 @@ export function LookupScreen() {
 
   const { state, lookup, reset } = useVehicleLookup();
 
+  // Auto-detect on mount (silent)
+  useEffect(() => {
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') return;
+        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+        const [geo] = await Location.reverseGeocodeAsync(pos.coords);
+        if (geo?.isoCountryCode) {
+          const found = COUNTRIES.find(c => c.code === geo.isoCountryCode);
+          if (found) setCountry(found.code);
+        }
+        if (geo?.postalCode) {
+          setPostcode(geo.postalCode);
+          setLocMsg({ text: `Detected: ${geo.postalCode}`, ok: true });
+        }
+      } catch {
+        // Silent fail — user can detect manually
+      }
+    })();
+  }, []);
+
   function handleCountryChange(code: string) {
     setCountry(code); setPlate(''); setPostcode(''); setLocMsg(null); reset();
   }
@@ -48,36 +70,22 @@ export function LookupScreen() {
         setLocMsg({ text: 'Location permission denied.', ok: false }); return;
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      const { latitude: lat, longitude: lng } = pos.coords;
+      const [geo] = await Location.reverseGeocodeAsync(pos.coords);
 
-      if (country === 'GB') {
-        const r = await fetch(`https://api.postcodes.io/postcodes?lon=${lng}&lat=${lat}`);
-        const d = await r.json();
-        const pc = d?.result?.[0]?.postcode ?? null;
-        if (pc) { setPostcode(pc); setLocMsg({ text: `Detected: ${pc}`, ok: true }); }
-        else setLocMsg({ text: 'Postcode not found. Enter manually.', ok: false });
-      } else if (country === 'JP') {
-        const r = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-          { headers: { 'Accept-Language': 'ja' } },
-        );
-        const d = await r.json();
-        const raw = d?.address?.postcode?.replace('-', '') ?? null;
-        if (raw) {
-          const fmt = raw.slice(0, 3) + '-' + raw.slice(3);
-          setPostcode(fmt); setLocMsg({ text: `\u3012${fmt}`, ok: true });
-        } else {
-          setLocMsg({ text: '\u90f5\u4fbf\u756a\u53f7\u3092\u53d6\u5f97\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f', ok: false });
+      // Auto-set country if it's in our supported list
+      if (geo?.isoCountryCode) {
+        const found = COUNTRIES.find(c => c.code === geo.isoCountryCode);
+        if (found && found.code !== country) {
+          setCountry(found.code);
+          setPlate('');
         }
+      }
+
+      if (geo?.postalCode) {
+        setPostcode(geo.postalCode);
+        setLocMsg({ text: `Detected: ${geo.postalCode}`, ok: true });
       } else {
-        const r = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-          { headers: { 'Accept-Language': 'en' } },
-        );
-        const d = await r.json();
-        const zip = d?.address?.postcode ?? null;
-        if (zip) { setPostcode(zip); setLocMsg({ text: `Detected: ${zip}`, ok: true }); }
-        else setLocMsg({ text: 'ZIP not found. Enter manually.', ok: false });
+        setLocMsg({ text: 'Postcode not found. Enter manually.', ok: false });
       }
     } catch {
       setLocMsg({ text: 'Could not detect location.', ok: false });
@@ -86,12 +94,13 @@ export function LookupScreen() {
     }
   }
 
-  const isJP     = country === 'JP';
-  const canSearch = plate.trim().length >= 2 && state.status !== 'loading' && !isJP;
+  const isJP      = country === 'JP';
+  const canSearch  = plate.trim().length >= 2 && state.status !== 'loading' && !isJP;
 
   const pcPlaceholders: Record<string, string> = {
     GB: 'Postcode (e.g. W1K 3JP)',
     US: 'ZIP code (e.g. 10001)',
+    NL: 'Postcode (e.g. 1234 AB)',
     JP: 'Postcode (e.g. 100-0001)',
   };
 
