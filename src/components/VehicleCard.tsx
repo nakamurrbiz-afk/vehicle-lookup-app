@@ -219,9 +219,17 @@ export function VehicleCard({ data, postcode }: Props) {
           </View>
         )}
 
-        {images.some(img => img.source === 'unsplash') && (
-          <Text style={styles.credit} pointerEvents="none">Photos by Unsplash</Text>
-        )}
+        {(() => {
+          const hasWiki    = images.some(img => img.source === 'wikipedia');
+          const hasUnsplash = images.some(img => img.source === 'unsplash');
+          const credit = hasWiki && hasUnsplash ? 'Wikipedia · Unsplash'
+                       : hasWiki                ? 'Wikipedia / CC BY-SA'
+                       : hasUnsplash            ? 'Unsplash'
+                       : null;
+          return credit
+            ? <Text style={styles.credit} pointerEvents="none">{credit}</Text>
+            : null;
+        })()}
       </View>
 
       {/* ── Quick specs ── */}
