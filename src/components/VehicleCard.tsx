@@ -169,11 +169,11 @@ export function VehicleCard({ data, postcode }: Props) {
             }}
           >
             {images.map((img, i) => (
-              <View key={i} style={{ width: heroWidth, height: 240 }}>
+              <View key={i} style={{ width: heroWidth, height: 240, backgroundColor: i === 0 ? '#080C1E' : undefined }}>
                 <Image
                   source={{ uri: img.url }}
                   style={{ width: heroWidth, height: 240 }}
-                  resizeMode="cover"
+                  resizeMode={i === 0 ? 'contain' : 'cover'}
                 />
               </View>
             ))}
