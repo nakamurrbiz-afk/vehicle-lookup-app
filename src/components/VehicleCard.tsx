@@ -51,7 +51,12 @@ function StarRating({ stars }: { stars: number }) {
 }
 
 function SectionLabel({ label }: { label: string }) {
-  return <Text style={styles.sectionLabel}>{label}</Text>;
+  return (
+    <View style={styles.sectionLabelRow}>
+      <View style={styles.sectionAccent} />
+      <Text style={styles.sectionLabel}>{label}</Text>
+    </View>
+  );
 }
 
 function SpecRow({ label, value, sub }: { label: string; value: string; sub?: string }) {
@@ -175,9 +180,7 @@ export function VehicleCard({ data, postcode }: Props) {
           </ScrollView>
         ) : (
           <View style={styles.heroPh}>
-            {hasImages
-              ? <ActivityIndicator color={colors.blue} />
-              : <Text style={styles.heroPhIcon}>🚗</Text>}
+            {hasImages && <ActivityIndicator color={colors.blue} />}
           </View>
         )}
 
@@ -215,7 +218,7 @@ export function VehicleCard({ data, postcode }: Props) {
         {/* Popularity badge */}
         {data.popularityCount > 1 && (
           <View style={styles.popularityBadge}>
-            <Text style={styles.popularityTxt}>🔍 {data.popularityCount} lookups</Text>
+            <Text style={styles.popularityTxt}>{data.popularityCount} lookups</Text>
           </View>
         )}
 
@@ -384,7 +387,7 @@ export function VehicleCard({ data, postcode }: Props) {
           <SectionLabel label="Recurring MOT Failures" />
           {data.commonFailures.map((f, i) => (
             <View key={i} style={styles.failureRow}>
-              <Text style={styles.failureDot}>⚠</Text>
+              <View style={styles.failureDot} />
               <Text style={styles.failureText}>{f}</Text>
             </View>
           ))}
@@ -440,7 +443,7 @@ export function VehicleCard({ data, postcode }: Props) {
                     <Text style={styles.priceLbl}>from</Text>
                   </View>
                 )}
-                <Text style={styles.arrow}>›</Text>
+                <View style={styles.chevron} />
               </TouchableOpacity>
             ))
           )}
@@ -458,13 +461,12 @@ const styles = StyleSheet.create({
   },
 
   // Hero / carousel
-  hero:   { width: '100%', height: 240, backgroundColor: '#0D1530', overflow: 'hidden' },
+  hero:   { width: '100%', height: 240, backgroundColor: '#080C1E', overflow: 'hidden' },
   heroPh: { height: 240, alignItems: 'center', justifyContent: 'center' },
-  heroPhIcon: { fontSize: 40, opacity: 0.15 },
   heroTitle:  { position: 'absolute', bottom: 0, left: 0, right: 0, padding: spacing.lg, paddingBottom: spacing.md },
-  heroMake:   { fontSize: font.sizes.xs, fontWeight: font.weights.bold, color: 'rgba(255,255,255,0.55)', letterSpacing: 2, marginBottom: 2 },
-  heroModel:  { fontSize: font.sizes.xxl, fontWeight: font.weights.extrabold, color: colors.t1, letterSpacing: -0.5, lineHeight: 30 },
-  heroYear:   { fontSize: font.sizes.sm, color: 'rgba(255,255,255,0.5)', marginTop: 4 },
+  heroMake:   { fontSize: font.sizes.xs, fontWeight: font.weights.bold, color: 'rgba(255,255,255,0.50)', letterSpacing: 2.5, marginBottom: 4 },
+  heroModel:  { fontSize: font.sizes.xxl, fontWeight: font.weights.extrabold, color: colors.t1, letterSpacing: -0.3, lineHeight: 32 },
+  heroYear:   { fontSize: font.sizes.sm, color: 'rgba(255,255,255,0.45)', marginTop: 4 },
 
   // Dot indicators
   dots: {
@@ -472,8 +474,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', justifyContent: 'center', gap: 5,
   },
   dot: {
-    width: 6, height: 6, borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.35)',
+    width: 5, height: 5, borderRadius: 2.5,
+    backgroundColor: 'rgba(255,255,255,0.22)',
   },
   dotActive: {
     backgroundColor: '#fff', width: 18, borderRadius: 3,
@@ -481,10 +483,11 @@ const styles = StyleSheet.create({
 
   popularityBadge: {
     position: 'absolute', top: spacing.sm, right: spacing.sm,
-    backgroundColor: 'rgba(0,0,0,0.55)', borderRadius: radius.full,
+    backgroundColor: 'rgba(0,0,0,0.50)', borderRadius: radius.full,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.10)',
     paddingHorizontal: spacing.sm, paddingVertical: 3,
   },
-  popularityTxt: { color: 'rgba(255,255,255,0.7)', fontSize: 10 },
+  popularityTxt: { color: 'rgba(255,255,255,0.55)', fontSize: 11, letterSpacing: 0.3 },
   credit: {
     position: 'absolute', bottom: spacing.sm, right: spacing.md,
     fontSize: 10, color: 'rgba(255,255,255,0.3)',
@@ -493,16 +496,18 @@ const styles = StyleSheet.create({
   },
 
   // Sections
-  section:      { borderTopWidth: 1, borderTopColor: colors.border, padding: spacing.md, gap: 6 },
-  sectionLabel: { fontSize: font.sizes.xs, fontWeight: font.weights.bold, letterSpacing: 1, textTransform: 'uppercase', color: colors.t3, marginBottom: 4 },
-  sourceNote:   { fontSize: 10, color: colors.t4, marginTop: 4 },
+  section:         { borderTopWidth: 1, borderTopColor: colors.border, padding: spacing.md, gap: 8 },
+  sectionLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  sectionAccent:   { width: 2, height: 11, borderRadius: 1, backgroundColor: colors.blue },
+  sectionLabel:    { fontSize: font.sizes.xs, fontWeight: font.weights.bold, letterSpacing: 1.2, textTransform: 'uppercase', color: colors.t3 },
+  sourceNote:      { fontSize: 11, color: colors.t4, marginTop: 2 },
 
   // Spec rows
-  specRow:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 5, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.05)' },
+  specRow:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: 'rgba(255,255,255,0.07)' },
   specRowLabel:  { fontSize: font.sizes.sm, color: colors.t3 },
   specRowRight:  { alignItems: 'flex-end' },
   specRowValue:  { fontSize: font.sizes.sm, color: colors.t1, fontWeight: font.weights.semibold },
-  specRowSub:    { fontSize: 10, color: colors.t4 },
+  specRowSub:    { fontSize: 11, color: colors.t4 },
 
   // Colour swatch
   colourRow:      { gap: 3 },
@@ -541,13 +546,13 @@ const styles = StyleSheet.create({
   mileageCol:   { flex: 1, alignItems: 'center', gap: 3 },
   mileageBarBg: { flex: 1, width: '100%', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 3, justifyContent: 'flex-end', overflow: 'hidden' },
   mileageBarFill: { width: '100%', borderRadius: 3 },
-  mileageYear:  { fontSize: 9, color: colors.t4 },
-  mileageMi:    { fontSize: 9, color: colors.t3, fontWeight: font.weights.semibold },
+  mileageYear:  { fontSize: 10, color: colors.t4 },
+  mileageMi:    { fontSize: 10, color: colors.t3, fontWeight: font.weights.semibold },
 
   // Common failures
-  failureRow:  { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start', paddingVertical: 3 },
-  failureDot:  { fontSize: 12, color: colors.yellow, marginTop: 1 },
-  failureText: { flex: 1, fontSize: font.sizes.sm, color: colors.t2, lineHeight: 18 },
+  failureRow:  { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start', paddingVertical: 4 },
+  failureDot:  { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.t3, marginTop: 6 },
+  failureText: { flex: 1, fontSize: font.sizes.sm, color: colors.t2, lineHeight: 20 },
 
   // Meta
   meta:      { flexDirection: 'row', gap: spacing.sm, padding: spacing.md, backgroundColor: 'rgba(0,0,0,0.2)', borderTopWidth: 1, borderTopColor: colors.border },
@@ -567,7 +572,7 @@ const styles = StyleSheet.create({
   priceBox:     { alignItems: 'flex-end' },
   priceVal:     { fontSize: font.sizes.md, fontWeight: font.weights.extrabold, color: colors.blue },
   priceLbl:     { fontSize: 10, color: colors.t4 },
-  arrow:        { color: colors.t3, fontSize: font.sizes.lg },
+  chevron:      { width: 7, height: 7, borderTopWidth: 1.5, borderRightWidth: 1.5, borderColor: colors.blue, transform: [{ rotate: '45deg' }], marginRight: 2 },
   skeletonRow:  { height: 52, borderRadius: radius.md, backgroundColor: 'rgba(255,255,255,0.06)' },
   listingsNone: { fontSize: font.sizes.sm, color: colors.t3, textAlign: 'center', paddingVertical: spacing.sm },
 });

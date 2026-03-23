@@ -7,7 +7,6 @@ export function HistoryScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <Text style={styles.icon}>📋</Text>
         <Text style={styles.title}>Search History</Text>
         <Text style={styles.sub}>Your recent lookups will appear here.</Text>
         <Text style={styles.comingSoon}>Coming Soon</Text>
@@ -25,7 +24,6 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
     gap: spacing.sm,
   },
-  icon: { fontSize: 48 },
   title: {
     fontSize: font.sizes.xl,
     fontWeight: font.weights.bold,

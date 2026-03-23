@@ -8,20 +8,10 @@ interface Props {
   onRetry: () => void;
 }
 
-const ERROR_ICONS: Record<number, string> = {
-  0: '📡',
-  400: '⚠️',
-  404: '🔍',
-  429: '⏱️',
-  502: '🔌',
-};
-
 export function ErrorCard({ error, onRetry }: Props) {
-  const icon = ERROR_ICONS[error.status] ?? '❌';
-
   return (
     <View style={styles.card}>
-      <Text style={styles.icon}>{icon}</Text>
+      <View style={styles.accent} />
       <Text style={styles.title}>{error.title}</Text>
       <Text style={styles.detail}>{error.detail}</Text>
       <TouchableOpacity style={styles.button} onPress={onRetry} activeOpacity={0.8}>
@@ -33,22 +23,23 @@ export function ErrorCard({ error, onRetry }: Props) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'rgba(248,113,113,0.07)',
+    backgroundColor: 'rgba(224,96,96,0.06)',
     borderRadius: radius.lg,
     padding: spacing.xl,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(248,113,113,0.2)',
+    borderColor: 'rgba(224,96,96,0.18)',
     gap: spacing.sm,
   },
-  icon: {
-    fontSize: 40,
-    marginBottom: spacing.xs,
+  accent: {
+    width: 32, height: 2, borderRadius: 1,
+    backgroundColor: colors.red, marginBottom: spacing.xs,
   },
   title: {
     fontSize: font.sizes.lg,
     fontWeight: font.weights.bold,
-    color: colors.red,
+    color: colors.t1,
+    letterSpacing: -0.3,
   },
   detail: {
     fontSize: font.sizes.sm,

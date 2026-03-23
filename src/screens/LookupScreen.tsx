@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView, StyleSheet,
   ActivityIndicator, KeyboardAvoidingView, Platform,
@@ -31,6 +31,14 @@ export function LookupScreen() {
   const [locMsg,   setLocMsg]   = useState<{ text: string; ok: boolean } | null>(null);
 
   const { state, lookup, reset } = useVehicleLookup();
+  const scrollRef = useRef<ScrollView>(null);
+
+  // Scroll to reveal search button when US state row appears
+  useEffect(() => {
+    if (country === 'US') {
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 200);
+    }
+  }, [country]);
 
   // Auto-detect on mount (silent)
   useEffect(() => {
@@ -109,6 +117,7 @@ export function LookupScreen() {
       <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView
+          ref={scrollRef}
           style={styles.scroll}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
@@ -201,7 +210,7 @@ export function LookupScreen() {
             >
               {state.status === 'loading'
                 ? <ActivityIndicator color="#fff" />
-                : <Text style={[styles.searchBtnTxt, !canSearch && styles.searchBtnTxtOff]}>
+                : <Text style={[styles.searchBtnTxt, !canSearch && styles.searchBtnTxtOff]} adjustsFontSizeToFit numberOfLines={1}>
                     {isJP ? 'Plate Lookup Unavailable for Japan' : 'Search Vehicle'}
                   </Text>}
             </TouchableOpacity>
@@ -213,7 +222,10 @@ export function LookupScreen() {
             <View>
               <View style={styles.resultBar}>
                 <Text style={styles.lbl}>Result</Text>
-                <TouchableOpacity onPress={() => { reset(); setPlate(''); }}>
+                <TouchableOpacity
+                  onPress={() => { reset(); setPlate(''); }}
+                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                >
                   <Text style={styles.clearTxt}>Clear</Text>
                 </TouchableOpacity>
               </View>
@@ -237,14 +249,14 @@ const styles = StyleSheet.create({
   scroll:   { flex: 1 },
   content:  { padding: spacing.lg, paddingBottom: spacing.xxl, gap: spacing.lg },
   header:   { paddingTop: spacing.lg, paddingBottom: spacing.sm, alignItems: 'center' },
-  title:    { fontSize: font.sizes.xxxl, fontWeight: font.weights.extrabold, color: colors.t1, letterSpacing: -0.5 },
-  subtitle: { marginTop: spacing.xs, fontSize: font.sizes.sm, color: colors.t3, textAlign: 'center' },
+  title:    { fontSize: font.sizes.xxxl, fontWeight: font.weights.extrabold, color: colors.t1, letterSpacing: -1 },
+  subtitle: { marginTop: spacing.xs, fontSize: font.sizes.sm, color: colors.t4, textAlign: 'center', letterSpacing: 0.3 },
   card:     { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.xl, padding: spacing.lg, gap: spacing.lg },
-  lbl:      { fontSize: font.sizes.xs, fontWeight: font.weights.bold, letterSpacing: 1.1, textTransform: 'uppercase', color: colors.t3, marginBottom: spacing.sm },
+  lbl:      { fontSize: font.sizes.xs, fontWeight: font.weights.bold, letterSpacing: 1.2, textTransform: 'uppercase', color: colors.t3, marginBottom: spacing.sm },
   lblNote:  { fontWeight: '400', textTransform: 'none', letterSpacing: 0, fontSize: font.sizes.xs, color: colors.t4 },
   locRow:   { flexDirection: 'row', gap: spacing.sm },
   locInput: { flex: 1, padding: spacing.md, backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, fontSize: font.sizes.md, fontWeight: font.weights.semibold, color: colors.t1, letterSpacing: 0.7 },
-  locBtn:   { paddingHorizontal: spacing.md, backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', minWidth: 80 },
+  locBtn:   { paddingHorizontal: spacing.md, backgroundColor: 'rgba(255,255,255,0.07)', borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center', minWidth: 80, height: 44 },
   locBtnTxt:    { fontSize: font.sizes.sm, fontWeight: font.weights.semibold, color: colors.t2 },
   locStatus:    { fontSize: font.sizes.xs, marginTop: spacing.xs },
   locOk:        { color: colors.green },
@@ -254,12 +266,12 @@ const styles = StyleSheet.create({
   searchBtn:    { height: 54, borderRadius: radius.full, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.blue, shadowColor: colors.blue, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12, elevation: 6 },
   searchBtnOff: { backgroundColor: 'rgba(255,255,255,0.09)', shadowOpacity: 0, elevation: 0 },
   searchBtnTxt:    { color: '#fff', fontSize: font.sizes.lg, fontWeight: font.weights.bold },
-  searchBtnTxtOff: { color: colors.t4, fontSize: font.sizes.sm },
+  searchBtnTxtOff: { color: colors.t4 },
   resultBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
-  clearTxt:  { fontSize: font.sizes.sm, color: colors.t3 },
+  clearTxt:  { fontSize: font.sizes.sm, color: colors.blue },
   stateScroll:     { marginHorizontal: -spacing.xs },
   stateRow:        { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing.xs },
-  stateChip:       { paddingHorizontal: spacing.sm, paddingVertical: 6, borderRadius: radius.full, borderWidth: 1, borderColor: colors.border, backgroundColor: 'rgba(255,255,255,0.05)' },
+  stateChip:       { paddingHorizontal: spacing.sm, paddingVertical: 8, minHeight: 36, borderRadius: radius.full, borderWidth: 1, borderColor: colors.border, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center' },
   stateChipActive: { backgroundColor: colors.blue, borderColor: colors.blue },
   stateChipTxt:    { fontSize: font.sizes.xs, fontWeight: font.weights.semibold, color: colors.t3, letterSpacing: 0.5 },
   stateChipTxtActive: { color: '#fff' },

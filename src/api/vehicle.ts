@@ -1,7 +1,8 @@
-// For Expo Go on your phone: use your PC's local IP (e.g. http://192.168.1.x:3000)
-// For Android emulator: http://10.0.2.2:3000
-// For iOS simulator: http://localhost:3000
-export const API_BASE_URL = 'http://localhost:3000';
+// Web (browser): localhost  |  Physical device: local IP
+import { Platform } from 'react-native';
+export const API_BASE_URL = Platform.OS === 'web'
+  ? 'http://localhost:3000'
+  : 'http://192.168.3.7:3000';
 
 export interface MileageRecord { date: string; mileage: number; passed: boolean; }
 export interface RunningCost { fuelPerYear: string; totalPerYear: string; perMile: string; source: string; }

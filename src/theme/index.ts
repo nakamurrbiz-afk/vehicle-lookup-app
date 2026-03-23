@@ -18,7 +18,7 @@ export const colors = {
   yellow: '#FCD34D',
   plateBg:     '#FFF9C4',
   plateBorder: '#CDBA00',
-  // legacy aliases kept for compatibility
+  // legacy aliases
   primary:    '#070C1A',
   accent:     '#4FA3FF',
   background: '#070C1A',
@@ -42,7 +42,7 @@ export const spacing = {
 };
 
 export const radius = {
-  sm: 8, md: 14, lg: 20, xl: 26, full: 9999,
+  sm: 6, md: 12, lg: 18, xl: 24, full: 9999,
 };
 
 export const font = {

@@ -129,27 +129,28 @@ const styles = StyleSheet.create({
     padding: spacing.md, borderRadius: radius.md,
     borderWidth: 1, borderColor: colors.borderBlue,
     backgroundColor: colors.surfaceAct,
+    overflow: 'hidden',
   },
   pillFlag:  { fontSize: 26 },
   pillTexts: { flex: 1 },
   pillLabel: { fontSize: font.sizes.md, fontWeight: font.weights.semibold, color: colors.blue },
   pillFmt:   { fontSize: font.sizes.xs, color: colors.t4, fontFamily: 'monospace', marginTop: 2 },
   changeBtn: {
-    paddingHorizontal: spacing.sm, paddingVertical: 5,
+    paddingHorizontal: spacing.sm, paddingVertical: 6,
     borderRadius: radius.full, borderWidth: 1, borderColor: colors.borderBlue,
     backgroundColor: colors.blueDim,
   },
   changeBtnTxt: { fontSize: font.sizes.xs, fontWeight: font.weights.semibold, color: colors.blue },
 
   // Modal
-  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.78)', justifyContent: 'flex-end' },
   sheet: {
-    backgroundColor: '#0D1526', borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl,
+    backgroundColor: '#080C1C', borderTopLeftRadius: radius.xl, borderTopRightRadius: radius.xl,
     maxHeight: '80%',
   },
   handle: {
-    width: 40, height: 4, borderRadius: 2,
-    backgroundColor: colors.border, alignSelf: 'center', marginTop: spacing.sm,
+    width: 32, height: 3, borderRadius: 1.5,
+    backgroundColor: 'rgba(255,255,255,0.18)', alignSelf: 'center', marginTop: spacing.sm,
   },
   sheetHeader: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',

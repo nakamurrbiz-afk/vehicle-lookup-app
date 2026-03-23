@@ -38,22 +38,22 @@ export function PlateInput({ value, onChange, country }: Props) {
 const styles = StyleSheet.create({
   wrapper: { alignItems: 'center' },
   plate: {
-    flexDirection: 'row', width: '100%', maxWidth: 320, height: 64,
-    borderRadius: radius.md, borderWidth: 2,
-    borderColor: 'rgba(255,255,255,0.22)',
+    flexDirection: 'row', width: '100%', maxWidth: 320, height: 68,
+    borderRadius: radius.md, borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.28)',
     overflow: 'hidden', backgroundColor: colors.plateBg,
   },
   strip: {
-    width: 44, alignItems: 'center', justifyContent: 'center',
+    width: 42, alignItems: 'center', justifyContent: 'center',
   },
   stripText: {
     color: '#fff', fontSize: font.sizes.xs,
-    fontWeight: font.weights.bold, letterSpacing: 0.5,
+    fontWeight: font.weights.bold, letterSpacing: 0.8,
   },
   input: {
     flex: 1, textAlign: 'center',
     fontSize: font.sizes.xxl, fontWeight: font.weights.bold,
-    color: '#111827', letterSpacing: 5, paddingHorizontal: spacing.sm,
+    color: '#111827', letterSpacing: 6, paddingHorizontal: spacing.sm,
   },
   inputJP: { fontSize: font.sizes.lg, letterSpacing: 2 },
 });
