@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView, StyleSheet,
   ActivityIndicator, KeyboardAvoidingView, Platform,
-  StatusBar, TextInput,
+  StatusBar, TextInput, Dimensions, Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
@@ -12,6 +12,60 @@ import { VehicleCard } from '../components/VehicleCard';
 import { ErrorCard } from '../components/ErrorCard';
 import { useVehicleLookup } from '../hooks/useVehicleLookup';
 import { colors, spacing, radius, font } from '../theme';
+import { VehicleResult, fetchVehicleMedia } from '../api/vehicle';
+import { HistoryEntry } from '../hooks/useHistory';
+
+interface Props {
+  onOpenHistory: () => void;
+  onResult: (result: VehicleResult) => void;
+  entries: HistoryEntry[];
+}
+
+function miniTimeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return 'Now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.floor(hrs / 24)}d ago`;
+}
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const CARD_WIDTH = Math.round(SCREEN_WIDTH * 0.70);
+const CARD_GAP = spacing.md;
+
+function RecentCard({ entry, onPress }: { entry: HistoryEntry; onPress: () => void }) {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!entry.make) return;
+    fetchVehicleMedia(entry.make, entry.model, entry.year, entry.country)
+      .then(media => setImageUrl(media?.images?.[0]?.url ?? null))
+      .catch(() => {});
+  }, []);
+
+  const label = [entry.make, entry.model].filter(Boolean).join(' ') || 'Unknown Vehicle';
+  const meta  = [entry.year, miniTimeAgo(entry.searchedAt)].filter(Boolean).join(' · ');
+
+  return (
+    <TouchableOpacity style={[styles.recentCard, { width: CARD_WIDTH }]} onPress={onPress} activeOpacity={0.75}>
+      <View style={styles.recentCardImg}>
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={styles.recentImg} resizeMode="cover" />
+        ) : (
+          <View style={styles.recentImgPlaceholder}>
+            <Text style={styles.recentImgInitial}>{entry.make?.[0] ?? '?'}</Text>
+          </View>
+        )}
+      </View>
+      <View style={styles.recentCardBody}>
+        <Text style={styles.recentVehicle} numberOfLines={1}>{label}</Text>
+        <Text style={styles.recentMeta} numberOfLines={1}>{meta}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
 
 const US_STATES = [
   'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
@@ -22,7 +76,7 @@ const US_STATES = [
   'DC',
 ];
 
-export function LookupScreen() {
+export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
   const [plate,    setPlate]    = useState('');
   const [country,  setCountry]  = useState('GB');
   const [usState,  setUsState]  = useState('CA');
@@ -32,6 +86,10 @@ export function LookupScreen() {
 
   const { state, lookup, reset } = useVehicleLookup();
   const scrollRef = useRef<ScrollView>(null);
+
+  useEffect(() => {
+    if (state.status === 'success') onResult(state.data);
+  }, [state.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Scroll to reveal search button when US state row appears
   useEffect(() => {
@@ -217,6 +275,48 @@ export function LookupScreen() {
 
           </View>
 
+          {/* Recent searches — hidden while result is showing */}
+          {entries.length > 0 && state.status !== 'success' && (
+            <View>
+              <View style={styles.recentHeader}>
+                <Text style={styles.lbl}>Recent</Text>
+                <TouchableOpacity
+                  onPress={onOpenHistory}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <Text style={styles.seeAllTxt}>See all</Text>
+                </TouchableOpacity>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.recentScroll}
+                contentContainerStyle={styles.recentContent}
+                keyboardShouldPersistTaps="handled"
+                snapToInterval={CARD_WIDTH + CARD_GAP}
+                snapToAlignment="start"
+                decelerationRate="fast"
+              >
+                {entries.slice(0, 10).map(entry => (
+                  <RecentCard
+                    key={entry.id}
+                    entry={entry}
+                    onPress={() => {
+                      setCountry(entry.country);
+                      setPlate(entry.plate);
+                      reset();
+                      setTimeout(() => lookup(
+                        entry.plate,
+                        entry.country,
+                        entry.country === 'US' ? usState : undefined,
+                      ), 50);
+                    }}
+                  />
+                ))}
+              </ScrollView>
+            </View>
+          )}
+
           {/* Result */}
           {state.status === 'success' && (
             <View>
@@ -275,4 +375,41 @@ const styles = StyleSheet.create({
   stateChipActive: { backgroundColor: colors.blue, borderColor: colors.blue },
   stateChipTxt:    { fontSize: font.sizes.xs, fontWeight: font.weights.semibold, color: colors.t3, letterSpacing: 0.5 },
   stateChipTxtActive: { color: '#fff' },
+
+  recentHeader:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
+  seeAllTxt:     { fontSize: font.sizes.sm, color: colors.blue, fontWeight: font.weights.semibold },
+  // bleed past parent padding so cards align to left edge of content
+  recentScroll:  { marginHorizontal: -spacing.lg },
+  recentContent: { paddingLeft: spacing.lg, paddingRight: spacing.lg, gap: CARD_GAP },
+
+  recentCard: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.xl,
+    overflow: 'hidden',
+  },
+  recentCardImg: {
+    width: '100%',
+    height: 86,
+    backgroundColor: 'rgba(255,255,255,0.04)',
+  },
+  recentImg: { width: '100%', height: '100%' },
+  recentImgPlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  recentImgInitial: {
+    fontSize: 40,
+    fontWeight: font.weights.bold,
+    color: colors.t4,
+  },
+  recentCardBody: {
+    padding: spacing.md,
+    gap: 4,
+  },
+  recentVehicle: { fontSize: font.sizes.md, fontWeight: font.weights.semibold, color: colors.t1 },
+  recentMeta:    { fontSize: font.sizes.xs, color: colors.t4 },
 });
