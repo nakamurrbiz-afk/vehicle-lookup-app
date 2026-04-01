@@ -21,12 +21,15 @@ export interface VehicleResult {
   insuranceGroup: InsuranceGroup | null;
   popularityCount: number;
   source: string; cachedAt: string | null;
+  affiliateLinks: AffiliateLink[];
   // US-specific
   recallCount: number | null;
   nhtsaSafetyRating: number | null;
   mpgCity: number | null;
   mpgHighway: number | null;
 }
+
+export interface AffiliateLink { platform: string; label: string; url: string; }
 
 export interface ApiError { status: number; title: string; detail: string; }
 

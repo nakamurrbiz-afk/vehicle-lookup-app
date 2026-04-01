@@ -6,7 +6,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   VehicleResult, ListingLink, MileageRecord, PriceSummary,
-  fetchVehicleMedia, CarImage,
+  fetchVehicleMedia, CarImage, AffiliateLink,
 } from '../api/vehicle';
 import { colors, spacing, radius, font } from '../theme';
 
@@ -447,6 +447,28 @@ export function VehicleCard({ data, postcode }: Props) {
               </TouchableOpacity>
             ))
           )}
+          {/* ── eBay affiliate CTAs ── */}
+          {data.affiliateLinks.map((link: AffiliateLink) => (
+            <TouchableOpacity
+              key={link.platform}
+              style={styles.ebayBtn}
+              onPress={() => {
+                if (Platform.OS === 'web') {
+                  (window as any).open(link.url, '_blank', 'noopener,noreferrer');
+                } else {
+                  Linking.openURL(link.url);
+                }
+              }}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.ebayLogo}>eBay</Text>
+              <View style={styles.listingBody}>
+                <Text style={styles.ebayCta}>{link.label}</Text>
+                <Text style={styles.ebayDisclosure}>Affiliate link · ebay.co.uk</Text>
+              </View>
+              <View style={styles.ebayChevron} />
+            </TouchableOpacity>
+          ))}
         </View>
       )}
     </View>
@@ -575,4 +597,26 @@ const styles = StyleSheet.create({
   chevron:      { width: 7, height: 7, borderTopWidth: 1.5, borderRightWidth: 1.5, borderColor: colors.blue, transform: [{ rotate: '45deg' }], marginRight: 2 },
   skeletonRow:  { height: 52, borderRadius: radius.md, backgroundColor: 'rgba(255,255,255,0.06)' },
   listingsNone: { fontSize: font.sizes.sm, color: colors.t3, textAlign: 'center', paddingVertical: spacing.sm },
+
+  // eBay affiliate button
+  ebayBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    padding: spacing.md, borderRadius: radius.md,
+    borderWidth: 1, borderColor: 'rgba(229,146,0,0.35)',
+    backgroundColor: 'rgba(229,146,0,0.07)',
+  },
+  ebayLogo: {
+    fontSize: font.sizes.md, fontWeight: font.weights.extrabold,
+    color: '#E59200', letterSpacing: -0.5,
+  },
+  ebayCta: {
+    fontSize: font.sizes.md, fontWeight: font.weights.semibold, color: colors.t1,
+  },
+  ebayDisclosure: {
+    fontSize: font.sizes.xs, color: colors.t4, marginTop: 2,
+  },
+  ebayChevron: {
+    width: 7, height: 7, borderTopWidth: 1.5, borderRightWidth: 1.5,
+    borderColor: '#E59200', transform: [{ rotate: '45deg' }], marginRight: 2,
+  },
 });

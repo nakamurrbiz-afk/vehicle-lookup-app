@@ -31,7 +31,7 @@ function miniTimeAgo(iso: string): string {
   return `${Math.floor(hrs / 24)}d ago`;
 }
 
-const SCREEN_WIDTH = Dimensions.get('window').width;
+const SCREEN_WIDTH = Platform.OS === 'web' ? 480 : Dimensions.get('window').width;
 const CARD_WIDTH = Math.round(SCREEN_WIDTH * 0.70);
 const CARD_GAP = spacing.md;
 
