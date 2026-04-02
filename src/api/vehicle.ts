@@ -4,6 +4,20 @@ export const API_BASE_URL = Platform.OS === 'web'
   ? 'http://localhost:3000'
   : 'http://192.168.3.7:3000';
 
+/**
+ * Build a server-side click-tracking redirect URL.
+ * The API logs the event then 302s to the real destination.
+ */
+export function buildTrackUrl(
+  listingId: string,
+  dest:      string,
+  plate:     string,
+  country:   string,
+): string {
+  const p = new URLSearchParams({ lid: listingId, dest, plate, country });
+  return `${API_BASE_URL}/v1/track/click?${p.toString()}`;
+}
+
 export interface MileageRecord { date: string; mileage: number; passed: boolean; }
 export interface RunningCost { fuelPerYear: string; totalPerYear: string; perMile: string; source: string; }
 export interface InsuranceGroup { min: number; max: number; label: string; }

@@ -6,7 +6,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import {
   VehicleResult, ListingLink, MileageRecord, PriceSummary,
-  fetchVehicleMedia, CarImage, AffiliateLink,
+  fetchVehicleMedia, CarImage, AffiliateLink, buildTrackUrl,
 } from '../api/vehicle';
 import { colors, spacing, radius, font } from '../theme';
 
@@ -423,7 +423,8 @@ export function VehicleCard({ data, postcode }: Props) {
                 key={l.id}
                 style={styles.listingBtn}
                 onPress={() => {
-                  const target = l.affiliateUrl ?? l.url;
+                  const dest   = l.affiliateUrl ?? l.url;
+                  const target = buildTrackUrl(l.id, dest, data.plate, data.country);
                   if (Platform.OS === 'web') {
                     (window as any).open(target, '_blank', 'noopener,noreferrer');
                   } else {
@@ -453,10 +454,11 @@ export function VehicleCard({ data, postcode }: Props) {
               key={link.platform}
               style={styles.ebayBtn}
               onPress={() => {
+                const target = buildTrackUrl(link.platform, link.url, data.plate, data.country);
                 if (Platform.OS === 'web') {
-                  (window as any).open(link.url, '_blank', 'noopener,noreferrer');
+                  (window as any).open(target, '_blank', 'noopener,noreferrer');
                 } else {
-                  Linking.openURL(link.url);
+                  Linking.openURL(target);
                 }
               }}
               activeOpacity={0.75}
