@@ -1,8 +1,13 @@
-// Web (browser): localhost  |  Physical device: local IP
 import { Platform } from 'react-native';
-export const API_BASE_URL = Platform.OS === 'web'
-  ? 'http://localhost:3000'
-  : 'http://192.168.3.7:3000';
+
+// Set EXPO_PUBLIC_API_URL in .env.local (dev) or EAS dashboard (production)
+const ENV_URL = process.env.EXPO_PUBLIC_API_URL;
+
+export const API_BASE_URL = ENV_URL
+  ? ENV_URL
+  : Platform.OS === 'web'
+    ? 'http://localhost:3000'
+    : 'http://192.168.3.7:3000';
 
 /**
  * Build a server-side click-tracking redirect URL.
