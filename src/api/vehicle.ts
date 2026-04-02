@@ -35,7 +35,7 @@ export interface VehicleResult {
   insuranceGroup: InsuranceGroup | null;
   popularityCount: number;
   source: string; cachedAt: string | null;
-  affiliateLinks: AffiliateLink[];
+  affiliateLinks: { platform: string; label: string; url: string }[];
   // US-specific
   recallCount: number | null;
   nhtsaSafetyRating: number | null;
@@ -43,7 +43,6 @@ export interface VehicleResult {
   mpgHighway: number | null;
 }
 
-export interface AffiliateLink { platform: string; label: string; url: string; }
 
 export interface ApiError { status: number; title: string; detail: string; }
 
