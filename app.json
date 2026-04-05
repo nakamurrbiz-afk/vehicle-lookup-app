@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "Bango",
+    "name": "Ban-go",
     "slug": "vehicle-lookup-app",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,8 +15,9 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.nakamurrbizafk.vehiclelookupapp",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
-      }
+  "ITSAppUsesNonExemptEncryption": false,
+  "NSLocationWhenInUseUsageDescription": "Your location is used to display nearby parking lots and vehicles on the map for seamless lookups. For example, it helps automatically prioritize the closest registered vehicles."
+}
     },
     "android": {
       "adaptiveIcon": {
