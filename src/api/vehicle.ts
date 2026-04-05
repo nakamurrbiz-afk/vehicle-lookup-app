@@ -3,11 +3,7 @@ import { Platform } from 'react-native';
 // Set EXPO_PUBLIC_API_URL in .env.local (dev) or EAS dashboard (production)
 const ENV_URL = process.env.EXPO_PUBLIC_API_URL;
 
-export const API_BASE_URL = ENV_URL
-  ? ENV_URL
-  : Platform.OS === 'web'
-    ? 'http://localhost:3000'
-    : 'http://192.168.3.7:3000';
+export const API_BASE_URL = 'https://bango-api.vercel.app/api/v1';
 
 /**
  * Build a server-side click-tracking redirect URL.
