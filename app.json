@@ -2,7 +2,7 @@
   "expo": {
     "name": "Ban-go",
     "slug": "vehicle-lookup-app",
-    "version": "1.0.1",
+    "version": "1.0.2", // ← 1.0.1 から 1.0.2 に上げる
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,10 +14,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nakamurrbizafk.vehiclelookupapp",
+      "buildNumber": "2", // ← ここを追加（前回のビルドが1なら2にする）
+      "icon": "./assets/icon.png", // ← ここを明示的に追加（アイコン反映を確実にするため）
       "infoPlist": {
-  "ITSAppUsesNonExemptEncryption": false,
-  "NSLocationWhenInUseUsageDescription": "Your location is used to display nearby parking lots and vehicles on the map for seamless lookups. For example, it helps automatically prioritize the closest registered vehicles."
-}
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Your location is used to display nearby parking lots and vehicles on the map for seamless lookups. For example, it helps automatically prioritize the closest registered vehicles."
+      }
     },
     "android": {
       "adaptiveIcon": {
