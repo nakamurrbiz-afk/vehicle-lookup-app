@@ -9,7 +9,7 @@ export interface Country { code: string; label: string; flag: string; plateForma
 
 export const COUNTRIES: Country[] = [
   { code: 'GB', label: 'United Kingdom', flag: '🇬🇧', plateFormat: 'AB12 CDE', available: true  },
-  { code: 'US', label: 'United States',  flag: '🇺🇸', plateFormat: '7ABC123',  available: false },
+  { code: 'US', label: 'United States',  flag: '🇺🇸', plateFormat: '7ABC123',  available: true  },
   { code: 'FR', label: 'France',         flag: '🇫🇷', plateFormat: 'AB-123-CD',available: false },
   { code: 'NL', label: 'Netherlands',    flag: '🇳🇱', plateFormat: 'AB-123-C', available: false },
   { code: 'JP', label: 'Japan',          flag: '🇯🇵', plateFormat: '品川301あ', available: false },

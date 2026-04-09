@@ -5,6 +5,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { colors, spacing, radius, font } from '../theme';
 import { HistoryEntry } from '../hooks/useHistory';
+import { useAnalytics } from '../hooks/useAnalytics';
 import { fetchVehicleMedia } from '../api/vehicle';
 
 interface Props {
@@ -28,6 +29,7 @@ function timeAgo(iso: string): string {
 }
 
 function HistoryRow({ entry, onRemove }: { entry: HistoryEntry; onRemove: (id: string) => void }) {
+  const { track } = useAnalytics();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -65,7 +67,7 @@ function HistoryRow({ entry, onRemove }: { entry: HistoryEntry; onRemove: (id: s
       {/* Delete */}
       <TouchableOpacity
         style={styles.deleteBtn}
-        onPress={() => onRemove(entry.id)}
+        onPress={() => { track({ name: 'history_entry_deleted', props: {} }); onRemove(entry.id); }}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         activeOpacity={0.6}
       >
@@ -76,6 +78,7 @@ function HistoryRow({ entry, onRemove }: { entry: HistoryEntry; onRemove: (id: s
 }
 
 export function HistoryScreen({ entries, onBack, onRemove, onClearAll }: Props) {
+  const { track } = useAnalytics();
   const renderItem = useCallback(
     ({ item }: { item: HistoryEntry }) => (
       <HistoryRow entry={item} onRemove={onRemove} />
@@ -103,7 +106,7 @@ export function HistoryScreen({ entries, onBack, onRemove, onClearAll }: Props) 
         {entries.length > 0 ? (
           <TouchableOpacity
             style={styles.clearBtn}
-            onPress={onClearAll}
+            onPress={() => { track({ name: 'history_cleared', props: { count: entries.length } }); onClearAll(); }}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             activeOpacity={0.7}
           >

@@ -11,6 +11,9 @@ import { PlateInput } from '../components/PlateInput';
 import { VehicleCard } from '../components/VehicleCard';
 import { ErrorCard } from '../components/ErrorCard';
 import { useVehicleLookup } from '../hooks/useVehicleLookup';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { ScannerScreen } from './ScannerScreen';
+import { PlateGameScreen } from './PlateGameScreen';
 import { colors, spacing, radius, font } from '../theme';
 import { VehicleResult, fetchVehicleMedia } from '../api/vehicle';
 import { HistoryEntry } from '../hooks/useHistory';
@@ -77,18 +80,27 @@ const US_STATES = [
 ];
 
 export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
-  const [plate,    setPlate]    = useState('');
-  const [country,  setCountry]  = useState('GB');
-  const [usState,  setUsState]  = useState('CA');
-  const [postcode, setPostcode] = useState('');
-  const [locating, setLocating] = useState(false);
-  const [locMsg,   setLocMsg]   = useState<{ text: string; ok: boolean } | null>(null);
+  const [plate,       setPlate]       = useState('');
+  const [country,     setCountry]     = useState('GB');
+  const [usState,     setUsState]     = useState('CA');
+  const [postcode,    setPostcode]    = useState('');
+  const [locating,    setLocating]    = useState(false);
+  const [locMsg,      setLocMsg]      = useState<{ text: string; ok: boolean } | null>(null);
+  const [showScanner, setShowScanner] = useState(false);
+  const [showGame,    setShowGame]    = useState(false);
 
   const { state, lookup, reset } = useVehicleLookup();
+  const { track } = useAnalytics();
   const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
-    if (state.status === 'success') onResult(state.data);
+    if (state.status === 'success') {
+      onResult(state.data);
+      track({ name: 'search_success', props: { country, make: state.data.make ?? '', model: state.data.model ?? '' } });
+    }
+    if (state.status === 'error') {
+      track({ name: 'search_error', props: { country, error: state.error } });
+    }
   }, [state.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Scroll to reveal search button when US state row appears
@@ -121,18 +133,24 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
   }, []);
 
   function handleCountryChange(code: string) {
+    track({ name: 'country_changed', props: { from: country, to: code } });
     setCountry(code); setPlate(''); setPostcode(''); setLocMsg(null); reset();
   }
 
   function handleSearch() {
-    if (plate.trim().length >= 2) lookup(plate, country, country === 'US' ? usState : undefined);
+    if (plate.trim().length >= 2) {
+      track({ name: 'search_initiated', props: { country, plate_length: plate.trim().length, has_postcode: postcode.trim().length > 0 } });
+      lookup(plate, country, country === 'US' ? usState : undefined);
+    }
   }
 
   async function detectLocation() {
+    track({ name: 'location_detect_tapped', props: {} });
     setLocating(true); setLocMsg(null);
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
+        track({ name: 'location_detected', props: { success: false } });
         setLocMsg({ text: 'Location permission denied.', ok: false }); return;
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
@@ -148,12 +166,15 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
       }
 
       if (geo?.postalCode) {
+        track({ name: 'location_detected', props: { success: true } });
         setPostcode(geo.postalCode);
         setLocMsg({ text: `Detected: ${geo.postalCode}`, ok: true });
       } else {
+        track({ name: 'location_detected', props: { success: false } });
         setLocMsg({ text: 'Postcode not found. Enter manually.', ok: false });
       }
     } catch {
+      track({ name: 'location_detected', props: { success: false } });
       setLocMsg({ text: 'Could not detect location.', ok: false });
     } finally {
       setLocating(false);
@@ -215,7 +236,16 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
             )}
 
             <View>
-              <Text style={styles.lbl}>License Plate</Text>
+              <View style={styles.plateHeader}>
+                <Text style={styles.lbl}>License Plate</Text>
+                <TouchableOpacity
+                  style={styles.scanBtn}
+                  onPress={() => setShowScanner(true)}
+                  activeOpacity={0.75}
+                >
+                  <Text style={styles.scanBtnTxt}>📷 Scan</Text>
+                </TouchableOpacity>
+              </View>
               <PlateInput value={plate} onChange={setPlate} country={country} />
             </View>
 
@@ -282,7 +312,7 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
               <View style={styles.recentHeader}>
                 <Text style={styles.lbl}>Recent</Text>
                 <TouchableOpacity
-                  onPress={onOpenHistory}
+                  onPress={() => { track({ name: 'history_opened', props: {} }); onOpenHistory(); }}
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <Text style={styles.seeAllTxt}>See all</Text>
@@ -303,6 +333,7 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
                     key={entry.id}
                     entry={entry}
                     onPress={() => {
+                      track({ name: 'recent_card_tapped', props: { country: entry.country } });
                       setCountry(entry.country);
                       setPlate(entry.plate);
                       reset();
@@ -323,12 +354,21 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
             <View>
               <View style={styles.resultBar}>
                 <Text style={styles.lbl}>Result</Text>
-                <TouchableOpacity
-                  onPress={() => { reset(); setPlate(''); }}
-                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                >
-                  <Text style={styles.clearTxt}>Clear</Text>
-                </TouchableOpacity>
+                <View style={styles.resultActions}>
+                  <TouchableOpacity
+                    style={styles.gameBtn}
+                    onPress={() => setShowGame(true)}
+                    activeOpacity={0.75}
+                  >
+                    <Text style={styles.gameBtnTxt}>🎮 Play Game</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => { reset(); setPlate(''); }}
+                    hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                  >
+                    <Text style={styles.clearTxt}>Clear</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
               <VehicleCard data={state.data} postcode={postcode} />
             </View>
@@ -340,6 +380,25 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
 
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {state.status === 'success' && (
+        <PlateGameScreen
+          visible={showGame}
+          plate={state.data.plate}
+          onClose={() => setShowGame(false)}
+        />
+      )}
+
+      <ScannerScreen
+        visible={showScanner}
+        country={country}
+        onDetected={(scannedPlate) => {
+          setPlate(scannedPlate);
+          setShowScanner(false);
+          setTimeout(() => lookup(scannedPlate, country, country === 'US' ? usState : undefined), 150);
+        }}
+        onClose={() => setShowScanner(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -368,8 +427,15 @@ const styles = StyleSheet.create({
   searchBtnOff: { backgroundColor: 'rgba(255,255,255,0.09)', shadowOpacity: 0, elevation: 0 },
   searchBtnTxt:    { color: '#fff', fontSize: font.sizes.lg, fontWeight: font.weights.bold },
   searchBtnTxtOff: { color: colors.t4 },
-  resultBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
-  clearTxt:  { fontSize: font.sizes.sm, color: colors.blue },
+  plateHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  scanBtn:     { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.blueDim, borderWidth: 1, borderColor: colors.borderBlue, borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: 5 },
+  scanBtnTxt:  { fontSize: font.sizes.xs, fontWeight: font.weights.bold, color: colors.blue, letterSpacing: 0.5 },
+
+  resultBar:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
+  resultActions:{ flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  gameBtn:      { backgroundColor: 'rgba(252,211,77,0.12)', borderWidth: 1, borderColor: 'rgba(252,211,77,0.3)', borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: 5 },
+  gameBtnTxt:   { fontSize: font.sizes.xs, fontWeight: font.weights.bold, color: colors.yellow, letterSpacing: 0.5 },
+  clearTxt:     { fontSize: font.sizes.sm, color: colors.blue },
   stateScroll:     { marginHorizontal: -spacing.xs },
   stateRow:        { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing.xs },
   stateChip:       { paddingHorizontal: spacing.sm, paddingVertical: 8, minHeight: 36, borderRadius: radius.full, borderWidth: 1, borderColor: colors.border, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center' },

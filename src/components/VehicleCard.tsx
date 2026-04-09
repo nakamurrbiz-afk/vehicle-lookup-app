@@ -246,7 +246,7 @@ export function VehicleCard({ data, postcode }: Props) {
         {data.co2Emissions != null && (
           <SpecRow label="CO₂" value={`${data.co2Emissions} g/km`} />
         )}
-        {lastMileage != null && (
+        {data.country === 'GB' && lastMileage != null && (
           <SpecRow
             label="Last MOT Mileage"
             value={`${lastMileage.toLocaleString()} mi`}
@@ -364,7 +364,7 @@ export function VehicleCard({ data, postcode }: Props) {
       {/* ── Running costs ── */}
       {data.runningCost && (
         <View style={styles.section}>
-          <SectionLabel label="Estimated Annual Running Costs (UK, ~10k mi)" />
+          <SectionLabel label={data.country === 'GB' ? 'Estimated Annual Running Costs (UK, ~10k mi)' : 'Estimated Annual Running Costs'} />
           <SpecRow label="Fuel per year"  value={data.runningCost.fuelPerYear} />
           <SpecRow label="Total per year" value={data.runningCost.totalPerYear} />
           <SpecRow label="Per mile"       value={data.runningCost.perMile} />
@@ -372,8 +372,8 @@ export function VehicleCard({ data, postcode }: Props) {
         </View>
       )}
 
-      {/* ── Mileage history ── */}
-      {data.mileageHistory.length > 1 && (
+      {/* ── Mileage history (GB only) ── */}
+      {data.country === 'GB' && data.mileageHistory.length > 1 && (
         <View style={styles.section}>
           <SectionLabel label="MOT Mileage History" />
           <MileageBar records={data.mileageHistory} />
@@ -381,8 +381,8 @@ export function VehicleCard({ data, postcode }: Props) {
         </View>
       )}
 
-      {/* ── Common failures ── */}
-      {data.commonFailures.length > 0 && (
+      {/* ── Common failures (GB only) ── */}
+      {data.country === 'GB' && data.commonFailures.length > 0 && (
         <View style={styles.section}>
           <SectionLabel label="Recurring MOT Failures" />
           {data.commonFailures.map((f, i) => (
