@@ -16,7 +16,7 @@ export function buildTrackUrl(
   country:   string,
 ): string {
   const p = new URLSearchParams({ lid: listingId, dest, plate, country });
-  return `${API_BASE_URL}/v1/track/click?${p.toString()}`;
+  return `${API_BASE_URL}/track/click?${p.toString()}`;
 }
 
 export interface MileageRecord { date: string; mileage: number; passed: boolean; }
@@ -54,7 +54,7 @@ export type LookupResult =
 export async function lookupVehicle(plate: string, country: string, state?: string): Promise<LookupResult> {
   const p = new URLSearchParams({ plate, country });
   if (state) p.set('state', state);
-  const url = `${API_BASE_URL}/v1/lookup?${p}`;
+  const url = `${API_BASE_URL}/lookup?${p}`;
   const res = await fetch(url, { headers: { Accept: 'application/json' } });
   const body = await res.json();
   return res.ok ? { ok: true, data: body } : { ok: false, error: body };
@@ -84,7 +84,7 @@ export async function fetchVehicleMedia(
   if (year)     p.set('year',     String(year));
   if (postcode) p.set('postcode', postcode);
   try {
-    const res = await fetch(`${API_BASE_URL}/v1/vehicle-media?${p}`, { headers: { Accept: 'application/json' } });
+    const res = await fetch(`${API_BASE_URL}/vehicle-media?${p}`, { headers: { Accept: 'application/json' } });
     if (!res.ok) return null;
     return await res.json();
   } catch { return null; }

@@ -160,8 +160,9 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
     }
   }
 
-  const isJP      = country === 'JP';
-  const canSearch  = plate.trim().length >= 2 && state.status !== 'loading' && !isJP;
+  const currentCountry = COUNTRIES.find(c => c.code === country) ?? COUNTRIES[0];
+  const isUnavailable  = !currentCountry.available;
+  const canSearch      = plate.trim().length >= 2 && state.status !== 'loading' && !isUnavailable;
 
   const pcPlaceholders: Record<string, string> = {
     GB: 'Postcode (e.g. W1K 3JP)',
@@ -251,11 +252,11 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
               )}
             </View>
 
-            {isJP && (
+            {isUnavailable && (
               <View style={styles.jpNotice}>
                 <Text style={styles.jpNoticeTxt}>
-                  Japan plate lookup is not yet supported (no public API).{'\n'}
-                  You can search used car listings directly below.
+                  {currentCountry.label} is currently under development and not yet available.{'\n'}
+                  Please check back soon for updates.
                 </Text>
               </View>
             )}
@@ -269,7 +270,7 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
               {state.status === 'loading'
                 ? <ActivityIndicator color="#fff" />
                 : <Text style={[styles.searchBtnTxt, !canSearch && styles.searchBtnTxtOff]} adjustsFontSizeToFit numberOfLines={1}>
-                    {isJP ? 'Plate Lookup Unavailable for Japan' : 'Search Vehicle'}
+                    {isUnavailable ? `${currentCountry.label} — Coming Soon` : 'Search Vehicle'}
                   </Text>}
             </TouchableOpacity>
 

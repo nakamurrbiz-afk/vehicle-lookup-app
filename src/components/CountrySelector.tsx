@@ -5,14 +5,14 @@ import {
 } from 'react-native';
 import { colors, spacing, radius, font } from '../theme';
 
-export interface Country { code: string; label: string; flag: string; plateFormat: string; }
+export interface Country { code: string; label: string; flag: string; plateFormat: string; available: boolean; }
 
 export const COUNTRIES: Country[] = [
-  { code: 'GB', label: 'United Kingdom', flag: '🇬🇧', plateFormat: 'AB12 CDE' },
-  { code: 'US', label: 'United States',  flag: '🇺🇸', plateFormat: '7ABC123'  },
-  { code: 'FR', label: 'France',         flag: '🇫🇷', plateFormat: 'AB-123-CD'},
-  { code: 'NL', label: 'Netherlands',    flag: '🇳🇱', plateFormat: 'AB-123-C' },
-  { code: 'JP', label: 'Japan',          flag: '🇯🇵', plateFormat: '品川301あ' },
+  { code: 'GB', label: 'United Kingdom', flag: '🇬🇧', plateFormat: 'AB12 CDE', available: true  },
+  { code: 'US', label: 'United States',  flag: '🇺🇸', plateFormat: '7ABC123',  available: false },
+  { code: 'FR', label: 'France',         flag: '🇫🇷', plateFormat: 'AB-123-CD',available: false },
+  { code: 'NL', label: 'Netherlands',    flag: '🇳🇱', plateFormat: 'AB-123-C', available: false },
+  { code: 'JP', label: 'Japan',          flag: '🇯🇵', plateFormat: '品川301あ', available: false },
 ];
 
 interface Props { selected: string; onChange: (code: string) => void; }
@@ -101,14 +101,19 @@ export function CountrySelector({ selected, onChange }: Props) {
                     onPress={() => handleSelect(item.code)}
                     activeOpacity={0.75}
                   >
-                    <Text style={styles.itemFlag}>{item.flag}</Text>
+                    <Text style={[styles.itemFlag, !item.available && styles.itemFlagDim]}>{item.flag}</Text>
                     <View style={styles.itemTexts}>
-                      <Text style={[styles.itemLabel, active && styles.itemLabelActive]}>
+                      <Text style={[styles.itemLabel, active && styles.itemLabelActive, !item.available && styles.itemLabelDim]}>
                         {item.label}
                       </Text>
                       <Text style={styles.itemFmt}>{item.plateFormat}</Text>
                     </View>
-                    {active && <Text style={styles.checkmark}>✓</Text>}
+                    {!item.available && (
+                      <View style={styles.comingSoonBadge}>
+                        <Text style={styles.comingSoonTxt}>Coming Soon</Text>
+                      </View>
+                    )}
+                    {active && item.available && <Text style={styles.checkmark}>✓</Text>}
                   </TouchableOpacity>
                 );
               }}
@@ -185,4 +190,8 @@ const styles = StyleSheet.create({
   itemFmt:         { fontSize: font.sizes.xs, color: colors.t4, fontFamily: 'monospace', marginTop: 2 },
   checkmark:       { fontSize: font.sizes.md, color: colors.blue, fontWeight: font.weights.bold },
   emptyTxt:        { textAlign: 'center', color: colors.t3, padding: spacing.xl },
+  itemFlagDim:     { opacity: 0.45 },
+  itemLabelDim:    { color: colors.t4 },
+  comingSoonBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.full, backgroundColor: 'rgba(255,165,0,0.15)', borderWidth: 1, borderColor: 'rgba(255,165,0,0.35)' },
+  comingSoonTxt:   { fontSize: 10, fontWeight: font.weights.semibold, color: '#FFA500', letterSpacing: 0.4 },
 });

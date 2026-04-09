@@ -2,7 +2,7 @@
   "expo": {
     "name": "Ban-go",
     "slug": "vehicle-lookup-app",
-    "version": "1.0.2", // ← 1.0.1 から 1.0.2 に上げる
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,11 +14,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.nakamurrbizafk.vehiclelookupapp",
-      "buildNumber": "2", // ← ここを追加（前回のビルドが1なら2にする）
-      "icon": "./assets/icon.png", // ← ここを明示的に追加（アイコン反映を確実にするため）
+      "buildNumber": "2",
+      "icon": "./assets/icon.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSLocationWhenInUseUsageDescription": "Your location is used to display nearby parking lots and vehicles on the map for seamless lookups. For example, it helps automatically prioritize the closest registered vehicles."
+        "NSLocationWhenInUseUsageDescription": "Ban-go uses your location to automatically detect your country and postcode, so nearby used-car listings appear without manual input. For example, if you are in the United Kingdom, the app sets the country to GB and pre-fills your postcode (e.g. SW1A 2AA) so search results are sorted by proximity to you."
       }
     },
     "android": {
