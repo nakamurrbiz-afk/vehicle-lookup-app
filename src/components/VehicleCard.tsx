@@ -9,6 +9,7 @@ import {
   fetchVehicleMedia, CarImage, buildTrackUrl,
 } from '../api/vehicle';
 import { colors, spacing, radius, font } from '../theme';
+import { AccessoriesSection } from './AccessoriesSection';
 
 interface Props { data: VehicleResult; postcode?: string; }
 
@@ -406,6 +407,9 @@ export function VehicleCard({ data, postcode }: Props) {
           </View>
         )}
       </View>
+
+      {/* ── Accessories & Parts ── */}
+      <AccessoriesSection data={data} />
 
       {/* ── Listings ── */}
       {(data.make || data.model) && (
