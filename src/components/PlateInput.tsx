@@ -5,10 +5,10 @@ import { colors, spacing, radius, font } from '../theme';
 interface Props { value: string; onChange: (v: string) => void; country: string; }
 
 const PLACEHOLDER: Record<string, string> = {
-  GB: 'e.g. AB12 CDE',
-  US: 'e.g. ABC 1234',
-  NL: 'e.g. AB-00-CD',
-  JP: '例）品川 あ 0000',
+  GB: 'AB12 CDE',
+  US: 'ABC 1234',
+  NL: 'AB-000-A',
+  JP: '品川000あ0000',
 };
 const STRIP_COLOR: Record<string, string> = {
   GB: '#012169', US: '#B22234', NL: '#AE1C28', JP: '#1a1a1a',
