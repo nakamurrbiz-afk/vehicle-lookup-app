@@ -79,6 +79,21 @@ const US_STATES = [
   'DC',
 ];
 
+const US_STATE_NAME_TO_CODE: Record<string, string> = {
+  'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA',
+  'Colorado':'CO','Connecticut':'CT','Delaware':'DE','Florida':'FL','Georgia':'GA',
+  'Hawaii':'HI','Idaho':'ID','Illinois':'IL','Indiana':'IN','Iowa':'IA',
+  'Kansas':'KS','Kentucky':'KY','Louisiana':'LA','Maine':'ME','Maryland':'MD',
+  'Massachusetts':'MA','Michigan':'MI','Minnesota':'MN','Mississippi':'MS',
+  'Missouri':'MO','Montana':'MT','Nebraska':'NE','Nevada':'NV',
+  'New Hampshire':'NH','New Jersey':'NJ','New Mexico':'NM','New York':'NY',
+  'North Carolina':'NC','North Dakota':'ND','Ohio':'OH','Oklahoma':'OK',
+  'Oregon':'OR','Pennsylvania':'PA','Rhode Island':'RI','South Carolina':'SC',
+  'South Dakota':'SD','Tennessee':'TN','Texas':'TX','Utah':'UT','Vermont':'VT',
+  'Virginia':'VA','Washington':'WA','West Virginia':'WV','Wisconsin':'WI',
+  'Wyoming':'WY','District of Columbia':'DC',
+};
+
 export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
   const [plate,       setPlate]       = useState('');
   const [country,     setCountry]     = useState('GB');
@@ -86,8 +101,10 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
   const [postcode,    setPostcode]    = useState('');
   const [locating,    setLocating]    = useState(false);
   const [locMsg,      setLocMsg]      = useState<{ text: string; ok: boolean } | null>(null);
-  const [showScanner, setShowScanner] = useState(false);
-  const [showGame,    setShowGame]    = useState(false);
+  const [showScanner,      setShowScanner]      = useState(false);
+  const [showGame,         setShowGame]         = useState(false);
+  const [stateAutoDetected, setStateAutoDetected] = useState(false);
+  const [showStatePicker,  setShowStatePicker]  = useState(false);
 
   const { state, lookup, reset } = useVehicleLookup();
   const { track } = useAnalytics();
@@ -121,6 +138,10 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
         if (geo?.isoCountryCode) {
           const found = COUNTRIES.find(c => c.code === geo.isoCountryCode);
           if (found) setCountry(found.code);
+          if (geo.isoCountryCode === 'US' && geo.region) {
+            const code = US_STATE_NAME_TO_CODE[geo.region];
+            if (code) { setUsState(code); setStateAutoDetected(true); }
+          }
         }
         if (geo?.postalCode) {
           setPostcode(geo.postalCode);
@@ -162,6 +183,10 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
         if (found && found.code !== country) {
           setCountry(found.code);
           setPlate('');
+        }
+        if (geo.isoCountryCode === 'US' && geo.region) {
+          const code = US_STATE_NAME_TO_CODE[geo.region];
+          if (code) { setUsState(code); setStateAutoDetected(true); setShowStatePicker(false); }
         }
       }
 
@@ -220,18 +245,33 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
 
             {country === 'US' && (
               <View>
-                <Text style={styles.lbl}>State</Text>
-                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.stateScroll} contentContainerStyle={styles.stateRow}>
-                  {US_STATES.map(s => (
-                    <TouchableOpacity
-                      key={s}
-                      style={[styles.stateChip, usState === s && styles.stateChipActive]}
-                      onPress={() => setUsState(s)}
-                    >
-                      <Text style={[styles.stateChipTxt, usState === s && styles.stateChipTxtActive]}>{s}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
+                <View style={styles.stateLabelRow}>
+                  <Text style={styles.lbl}>State</Text>
+                  {stateAutoDetected && !showStatePicker && (
+                    <Text style={styles.stateAutoTxt}>auto-detected</Text>
+                  )}
+                </View>
+                <TouchableOpacity
+                  style={styles.stateBadge}
+                  onPress={() => setShowStatePicker(v => !v)}
+                  activeOpacity={0.75}
+                >
+                  <Text style={styles.stateBadgeCode}>{usState}</Text>
+                  <Text style={styles.stateBadgeArrow}>{showStatePicker ? '▲' : '▼'}</Text>
+                </TouchableOpacity>
+                {showStatePicker && (
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.stateScroll} contentContainerStyle={styles.stateRow}>
+                    {US_STATES.map(s => (
+                      <TouchableOpacity
+                        key={s}
+                        style={[styles.stateChip, usState === s && styles.stateChipActive]}
+                        onPress={() => { setUsState(s); setStateAutoDetected(false); setShowStatePicker(false); }}
+                      >
+                        <Text style={[styles.stateChipTxt, usState === s && styles.stateChipTxtActive]}>{s}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </ScrollView>
+                )}
               </View>
             )}
 
@@ -436,7 +476,12 @@ const styles = StyleSheet.create({
   gameBtn:      { backgroundColor: 'rgba(252,211,77,0.12)', borderWidth: 1, borderColor: 'rgba(252,211,77,0.3)', borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: 5 },
   gameBtnTxt:   { fontSize: font.sizes.xs, fontWeight: font.weights.bold, color: colors.yellow, letterSpacing: 0.5 },
   clearTxt:     { fontSize: font.sizes.sm, color: colors.blue },
-  stateScroll:     { marginHorizontal: -spacing.xs },
+  stateLabelRow:   { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  stateAutoTxt:    { fontSize: font.sizes.xs, color: colors.green, fontWeight: font.weights.semibold },
+  stateBadge:      { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, alignSelf: 'flex-start', paddingHorizontal: spacing.md, paddingVertical: 10, borderRadius: radius.md, borderWidth: 1, borderColor: colors.borderBlue, backgroundColor: colors.blueDim },
+  stateBadgeCode:  { fontSize: font.sizes.lg, fontWeight: font.weights.bold, color: colors.blue, letterSpacing: 1 },
+  stateBadgeArrow: { fontSize: font.sizes.xs, color: colors.t3 },
+  stateScroll:     { marginHorizontal: -spacing.xs, marginTop: spacing.sm },
   stateRow:        { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing.xs },
   stateChip:       { paddingHorizontal: spacing.sm, paddingVertical: 8, minHeight: 36, borderRadius: radius.full, borderWidth: 1, borderColor: colors.border, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center' },
   stateChipActive: { backgroundColor: colors.blue, borderColor: colors.blue },
