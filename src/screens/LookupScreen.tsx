@@ -425,6 +425,9 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
         <PlateGameScreen
           visible={showGame}
           plate={state.data.plate}
+          make={state.data.make}
+          model={state.data.model}
+          year={state.data.year}
           onClose={() => setShowGame(false)}
         />
       )}
