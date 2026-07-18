@@ -51,13 +51,38 @@ export type LookupResult =
   | { ok: true;  data:  VehicleResult }
   | { ok: false; error: ApiError };
 
+// Map raw API errors to user-facing copy. Never surface internal upstream
+// names (PlateToVin, RapidAPI, DVLA, RDW, SIV) or "rate limit" jargon.
+function toFriendlyError(httpStatus: number, body: Partial<ApiError> | undefined): ApiError {
+  const status = body?.status ?? httpStatus;
+  switch (status) {
+    case 404:
+      return { status, title: 'No Match Found', detail: "We couldn't find a vehicle for that plate. Double-check the characters and the selected country, then try again." };
+    case 429:
+      return { status, title: 'Busy Right Now', detail: 'Lookups are in high demand at the moment. Please wait a few seconds and try again.' };
+    case 502:
+    case 503:
+    case 504:
+      return { status, title: 'Temporarily Unavailable', detail: 'The lookup service is briefly unavailable. Please try again in a moment.' };
+    default: {
+      const title  = body?.title  ?? 'Something Went Wrong';
+      const detail = body?.detail ?? 'Please try again.';
+      // Strip any leaked internal/upstream wording.
+      if (/upstream|plate.?to.?vin|rapidapi|\bsiv\b|\bdvla\b|\bdvsa\b|\brdw\b|rate limit/i.test(detail)) {
+        return { status, title: 'Something Went Wrong', detail: 'We hit a problem looking that up. Please try again shortly.' };
+      }
+      return { status, title, detail };
+    }
+  }
+}
+
 export async function lookupVehicle(plate: string, country: string, state?: string): Promise<LookupResult> {
   const p = new URLSearchParams({ plate, country });
   if (state) p.set('state', state);
   const url = `${API_BASE_URL}/lookup?${p}`;
   const res = await fetch(url, { headers: { Accept: 'application/json' } });
   const body = await res.json();
-  return res.ok ? { ok: true, data: body } : { ok: false, error: body };
+  return res.ok ? { ok: true, data: body } : { ok: false, error: toFriendlyError(res.status, body) };
 }
 
 export interface CarImage { url: string; alt: string; source: string; }
