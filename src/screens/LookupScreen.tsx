@@ -231,8 +231,8 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
 
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.title}>PlateCheck</Text>
-            <Text style={styles.subtitle}>Identify any vehicle from its license plate</Text>
+            <Text style={styles.title}>Ban-go</Text>
+            <Text style={styles.subtitle}>Identify any vehicle from its number plate</Text>
           </View>
 
           {/* Form card */}

@@ -271,8 +271,8 @@ export function VehicleCard({ data, postcode }: Props) {
         </View>
       )}
 
-      {/* ── Insurance group ── */}
-      {data.insuranceGroup && (
+      {/* ── Insurance group (UK-only concept: Thatcham groups) ── */}
+      {data.country === 'GB' && data.insuranceGroup && (
         <View style={styles.section}>
           <SectionLabel label="Insurance Group (Estimate)" />
           <View style={styles.insRow}>

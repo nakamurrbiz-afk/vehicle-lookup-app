@@ -8,11 +8,9 @@ import { colors, spacing, radius, font } from '../theme';
 export interface Country { code: string; label: string; flag: string; plateFormat: string; available: boolean; }
 
 export const COUNTRIES: Country[] = [
-  { code: 'GB', label: 'United Kingdom', flag: '🇬🇧', plateFormat: 'AB12 CDE',    available: true  },
-  { code: 'US', label: 'United States',  flag: '🇺🇸', plateFormat: 'ABC 1234',     available: true  },
-  { code: 'FR', label: 'France',         flag: '🇫🇷', plateFormat: 'AB-123-CD',    available: false },
-  { code: 'NL', label: 'Netherlands',    flag: '🇳🇱', plateFormat: 'AB-000-A',     available: false },
-  { code: 'JP', label: 'Japan',          flag: '🇯🇵', plateFormat: '品川000あ0000', available: false },
+  { code: 'GB', label: 'United Kingdom', flag: '🇬🇧', plateFormat: 'AB12 CDE', available: true },
+  { code: 'US', label: 'United States',  flag: '🇺🇸', plateFormat: 'ABC 1234',  available: true },
+  { code: 'NL', label: 'Netherlands',    flag: '🇳🇱', plateFormat: 'AB-000-A',  available: true },
 ];
 
 interface Props { selected: string; onChange: (code: string) => void; }

@@ -3,39 +3,53 @@
   "apple": {
     "copyright": "2026 NAKAMURR.BIZ",
     "info": {
+      "en-GB": {
+        "title": "Ban-go: Number Plate Check",
+        "subtitle": "MOT, Tax & Car History Check",
+        "description": "🚗 Know any car instantly — just from its number plate.\n\nSpotted a car and want to know more? Ban-go turns any UK number plate into a full vehicle report in seconds — straight from official DVLA and DVSA records. No sign-up, no subscription, no fuss.\n\n── WHAT YOU GET ──────────────────────────\n✓ Make, model, year & registered colour\n✓ Full MOT history with mileage timeline\n✓ Recurring MOT failure points\n✓ Fuel type, engine size & CO₂ emissions\n✓ Estimated annual running costs & tax band\n✓ Insurance group estimate\n✓ Euro NCAP safety rating\n✓ Used cars for sale near you\n\n── GREAT FOR ─────────────────────────────\n• Checking a used car before you buy it\n• Settling \"what car is that?\" debates on the spot\n• Spotting clocked mileage or a patchy MOT record\n• Verifying a car matches the seller's advert\n• Working out running costs before you commit\n\n── HOW IT WORKS ──────────────────────────\n1. Type in the number plate — or scan it with your camera\n2. Get a full vehicle report, instantly\n3. Tap through to used listings near you\n\n── OFFICIAL DATA ─────────────────────────\nUK data comes directly from the DVSA (official MOT records) and DVLA, so your MOT history, mileage and vehicle details are accurate and up to date.\n\nTravelling in the US? Ban-go also decodes US plates with NHTSA safety ratings, EPA fuel economy and active recalls.\n\nBan-go is the fastest way to check any car on the road. Whether you're a used-car buyer, a car enthusiast, or just curious about the car parked outside — Ban-go has the answer.",
+        "keywords": [
+          "reg",
+          "dvla",
+          "dvsa",
+          "ulez",
+          "mileage",
+          "used car",
+          "vehicle",
+          "checker",
+          "lookup",
+          "logbook",
+          "v5c",
+          "scrap",
+          "emissions",
+          "co2",
+          "road tax"
+        ],
+        "promoText": "Now with cleaner reports & faster plate scans. Decode any UK plate — MOT history, mileage, running costs, safety & used cars near you. Official DVLA & DVSA data.",
+        "supportUrl": "https://doc-hosting.flycricket.io/bango-terms-of-use/4440745d-df2e-450d-b28e-de507fb8e9ac/terms",
+        "privacyPolicyUrl": "https://doc-hosting.flycricket.io/bango-privacy-policy/63c81027-bd95-4ec7-b15d-6a08fef0080a/privacy"
+      },
       "en-US": {
         "title": "Ban-go: License Plate Lookup",
-        "subtitle": "Number Plate & MOT Checker",
-        "description": "🚗 Know any car instantly — just from its plate.\n\nSpotted a car on the road and want to know more? Ban-go turns any UK or US license plate into a full vehicle profile in seconds. No sign-up, no subscription, no fuss.\n\n── WHAT YOU GET ──────────────────────────\n✓ Make, model, year & registered colour\n✓ Full MOT history with mileage timeline\n✓ Fuel type, engine size & CO₂ emissions\n✓ Estimated annual running costs\n✓ Insurance group estimate\n✓ Euro NCAP safety rating\n✓ Used car listings near you\n✓ US: NHTSA safety rating, EPA fuel economy & active recalls\n\n── GREAT FOR ─────────────────────────────\n• Checking a car before you buy it used\n• Settling \"what car is that?\" debates instantly\n• Verifying a vehicle matches the seller's claims\n• Finding similar cars for sale near your location\n• Researching running costs before committing to a purchase\n\n── HOW IT WORKS ──────────────────────────\n1. Enter the license plate number\n2. Select your country (UK or US)\n3. Get a full vehicle report — instantly\n\n── DATA SOURCES ──────────────────────────\nUK data is sourced directly from the DVSA (official MOT records) and DVLA, giving you accurate and up-to-date MOT history, mileage records, and vehicle details.\n\nUS data is sourced from NHTSA (safety ratings and recalls) and the EPA (fuel economy estimates).\n\nBan-go is the fastest way to look up any vehicle on the road. Whether you're a car enthusiast, a used car buyer, or just curious about that vehicle parked outside — Ban-go has the answer.",
+        "subtitle": "VIN, Recalls & Vehicle Report",
+        "description": "🚗 Know any car instantly — just from its license plate.\n\nSaw a car and want to know more? Ban-go turns any US or UK license plate into a full vehicle report in seconds. No sign-up, no subscription, no fuss.\n\n── WHAT YOU GET ──────────────────────────\n✓ Make, model, year & color\n✓ NHTSA overall safety rating\n✓ Active safety recalls (NHTSA)\n✓ EPA fuel economy — city & highway MPG\n✓ Fuel type & engine details\n✓ Estimated annual running costs\n✓ Used cars for sale near you\n✓ UK plates: full MOT history & mileage timeline\n\n── GREAT FOR ─────────────────────────────\n• Checking a used car before you buy it\n• Settling \"what car is that?\" debates on the spot\n• Seeing whether a car has open recalls\n• Verifying a car matches the seller's listing\n• Researching running costs before you commit\n\n── HOW IT WORKS ──────────────────────────\n1. Enter the license plate — or scan it with your camera\n2. Pick your country (US or UK)\n3. Get a full vehicle report, instantly\n\n── OFFICIAL DATA ─────────────────────────\nUS data comes from the NHTSA (safety ratings and recalls) and the EPA (fuel economy estimates). UK data comes directly from the DVSA and DVLA (official MOT records).\n\nBan-go is the fastest way to look up any car on the road. Whether you're a used-car buyer, a car enthusiast, or just curious about the car parked outside — Ban-go has the answer.",
         "keywords": [
-          "number plate",
-          "DVLA",
-          "MOT history",
-          "plate check",
-          "car info",
-          "VIN",
+          "nhtsa",
+          "epa",
+          "mpg",
+          "dmv",
           "registration",
-          "car finder",
-          "identify car"
+          "used car",
+          "car specs",
+          "tag",
+          "decoder",
+          "title",
+          "safety rating",
+          "emissions",
+          "recall"
         ],
-        "promoText": "🆕 MOT history charts, running costs & used car listings near you. Instantly decode any UK or US plate — make, model, safety rating & more.",
+        "promoText": "Now with cleaner reports & faster plate scans. Decode any US plate — safety ratings, recalls, MPG & used cars near you. Plus full UK MOT history. No sign-up.",
         "supportUrl": "https://doc-hosting.flycricket.io/bango-terms-of-use/4440745d-df2e-450d-b28e-de507fb8e9ac/terms",
-        "privacyPolicyUrl": "https://doc-hosting.flycricket.io/bango-privacy-policy/63c81027-bd95-4ec7-b15d-6a08fef0080a/privacy",
-        "screenshots": {
-          "APP_IPHONE_61": [
-            "store\\apple\\screenshot\\en-US\\APP_IPHONE_61\\IMG_7932.png",
-            "store\\apple\\screenshot\\en-US\\APP_IPHONE_61\\IMG_7931.png",
-            "store\\apple\\screenshot\\en-US\\APP_IPHONE_61\\IMG_7934.png",
-            "store\\apple\\screenshot\\en-US\\APP_IPHONE_61\\IMG_7935.png",
-            "store\\apple\\screenshot\\en-US\\APP_IPHONE_61\\IMG_7936.png"
-          ],
-          "APP_IPHONE_65": [
-            "store\\apple\\screenshot\\en-US\\APP_IPHONE_65\\Mask group.png"
-          ],
-          "APP_IPAD_PRO_3GEN_129": [
-            "store\\apple\\screenshot\\en-US\\APP_IPAD_PRO_3GEN_129\\Group 1.png"
-          ]
-        }
+        "privacyPolicyUrl": "https://doc-hosting.flycricket.io/bango-privacy-policy/63c81027-bd95-4ec7-b15d-6a08fef0080a/privacy"
       }
     },
     "review": {
