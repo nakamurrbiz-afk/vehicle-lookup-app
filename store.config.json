@@ -6,7 +6,7 @@
       "en-GB": {
         "title": "Ban-go: Number Plate Check",
         "subtitle": "MOT, Tax & Car History Check",
-        "description": "🚗 Know any car instantly — just from its number plate.\n\nSpotted a car and want to know more? Ban-go turns any UK number plate into a full vehicle report in seconds — straight from official DVLA and DVSA records. No sign-up, no subscription, no fuss.\n\n── WHAT YOU GET ──────────────────────────\n✓ Make, model, year & registered colour\n✓ Full MOT history with mileage timeline\n✓ Recurring MOT failure points\n✓ Fuel type, engine size & CO₂ emissions\n✓ Estimated annual running costs & tax band\n✓ Insurance group estimate\n✓ Euro NCAP safety rating\n✓ Used cars for sale near you\n\n── GREAT FOR ─────────────────────────────\n• Checking a used car before you buy it\n• Settling \"what car is that?\" debates on the spot\n• Spotting clocked mileage or a patchy MOT record\n• Verifying a car matches the seller's advert\n• Working out running costs before you commit\n\n── HOW IT WORKS ──────────────────────────\n1. Type in the number plate — or scan it with your camera\n2. Get a full vehicle report, instantly\n3. Tap through to used listings near you\n\n── OFFICIAL DATA ─────────────────────────\nUK data comes directly from the DVSA (official MOT records) and DVLA, so your MOT history, mileage and vehicle details are accurate and up to date.\n\nTravelling in the US? Ban-go also decodes US plates with NHTSA safety ratings, EPA fuel economy and active recalls.\n\nBan-go is the fastest way to check any car on the road. Whether you're a used-car buyer, a car enthusiast, or just curious about the car parked outside — Ban-go has the answer.",
+        "description": "🚗 Know any car instantly — just from its number plate.\n\nSpotted a car and want to know more? Ban-go turns any UK number plate into a full vehicle report in seconds — straight from official DVLA and DVSA records. No sign-up, no subscription, no fuss.\n\n── WHAT YOU GET ──────────────────────────\n✓ Make, model, year & registered colour\n✓ Full MOT history with mileage timeline\n✓ Recurring MOT failure points\n✓ Fuel type, engine size & CO₂ emissions\n✓ Estimated annual running costs & tax band\n✓ Insurance group estimate\n✓ Euro NCAP safety rating\n✓ Used cars for sale near you\n\n── GREAT FOR ─────────────────────────────\n• Checking a used car before you buy it\n• Settling \"what car is that?\" debates on the spot\n• Spotting clocked mileage or a patchy MOT record\n• Verifying a car matches the seller's advert\n• Working out running costs before you commit\n\n── HOW IT WORKS ──────────────────────────\n1. Type in the number plate — or scan it with your camera\n2. Get a full vehicle report, instantly\n3. Tap through to used listings near you\n\n── OFFICIAL UK DATA ──────────────────────\nVehicle and MOT data comes directly from the DVSA (official MOT records) and DVLA, so your MOT history, mileage and vehicle details are accurate and up to date.\n\nBan-go is the fastest way to check any car on the road in the UK. Whether you're a used-car buyer, a car enthusiast, or just curious about the car parked outside — Ban-go has the answer.",
         "keywords": [
           "reg",
           "dvla",
@@ -25,51 +25,6 @@
           "road tax"
         ],
         "promoText": "Now with cleaner reports & faster plate scans. Decode any UK plate — MOT history, mileage, running costs, safety & used cars near you. Official DVLA & DVSA data.",
-        "supportUrl": "https://doc-hosting.flycricket.io/bango-terms-of-use/4440745d-df2e-450d-b28e-de507fb8e9ac/terms",
-        "privacyPolicyUrl": "https://doc-hosting.flycricket.io/bango-privacy-policy/63c81027-bd95-4ec7-b15d-6a08fef0080a/privacy"
-      },
-      "nl-NL": {
-        "title": "Ban-go: Kenteken Check",
-        "subtitle": "Auto-info, RDW & occasions",
-        "description": "🚗 Ken elke auto direct — alleen aan het kenteken.\n\nZie je een auto en wil je meer weten? Ban-go zet elk Nederlands kenteken in seconden om in een volledig voertuigprofiel, rechtstreeks uit de open data van de RDW. Geen account, geen abonnement.\n\n── WAT JE KRIJGT ──────────────────────────\n✓ Merk, model, bouwjaar & kleur\n✓ Brandstof, cilinderinhoud & CO₂-uitstoot\n✓ Veiligheidsscore (Euro NCAP)\n✓ Tweedehands auto's bij jou in de buurt\n\n── HANDIG VOOR ────────────────────────────\n• Een occasion controleren vóór je koopt\n• Snel \"welke auto is dat?\" beslechten\n• Checken of een auto klopt met de advertentie\n\n── ZO WERKT HET ───────────────────────────\n1. Vul het kenteken in — of scan het met je camera\n2. Krijg direct een volledig voertuigrapport\n\n── OFFICIËLE DATA ─────────────────────────\nNederlandse gegevens komen rechtstreeks uit de open data van de RDW.\n\nReis je naar het VK of de VS? Ban-go leest ook Britse en Amerikaanse kentekens, met APK-historie (VK) en veiligheidsscores en recalls (VS).\n\nBan-go is de snelste manier om elke auto op straat op te zoeken.",
-        "keywords": [
-          "voertuig",
-          "tweedehands",
-          "brandstof",
-          "uitstoot",
-          "merk",
-          "model",
-          "bouwjaar",
-          "opzoeken",
-          "autogegevens",
-          "apk",
-          "co2",
-          "kleur"
-        ],
-        "promoText": "Nieuw: schonere rapporten. Zoek elk Nederlands kenteken op — merk, model, brandstof, CO₂, veiligheid & occasions bij jou in de buurt. Uit RDW open data.",
-        "supportUrl": "https://doc-hosting.flycricket.io/bango-terms-of-use/4440745d-df2e-450d-b28e-de507fb8e9ac/terms",
-        "privacyPolicyUrl": "https://doc-hosting.flycricket.io/bango-privacy-policy/63c81027-bd95-4ec7-b15d-6a08fef0080a/privacy"
-      },
-      "en-US": {
-        "title": "Ban-go: License Plate Lookup",
-        "subtitle": "VIN, Recalls & Vehicle Report",
-        "description": "🚗 Know any car instantly — just from its license plate.\n\nSaw a car and want to know more? Ban-go turns any US or UK license plate into a full vehicle report in seconds. No sign-up, no subscription, no fuss.\n\n── WHAT YOU GET ──────────────────────────\n✓ Make, model, year & color\n✓ NHTSA overall safety rating\n✓ Active safety recalls (NHTSA)\n✓ EPA fuel economy — city & highway MPG\n✓ Fuel type & engine details\n✓ Estimated annual running costs\n✓ Used cars for sale near you\n✓ UK plates: full MOT history & mileage timeline\n\n── GREAT FOR ─────────────────────────────\n• Checking a used car before you buy it\n• Settling \"what car is that?\" debates on the spot\n• Seeing whether a car has open recalls\n• Verifying a car matches the seller's listing\n• Researching running costs before you commit\n\n── HOW IT WORKS ──────────────────────────\n1. Enter the license plate — or scan it with your camera\n2. Pick your country (US or UK)\n3. Get a full vehicle report, instantly\n\n── OFFICIAL DATA ─────────────────────────\nUS data comes from the NHTSA (safety ratings and recalls) and the EPA (fuel economy estimates). UK data comes directly from the DVSA and DVLA (official MOT records).\n\nBan-go is the fastest way to look up any car on the road. Whether you're a used-car buyer, a car enthusiast, or just curious about the car parked outside — Ban-go has the answer.",
-        "keywords": [
-          "nhtsa",
-          "epa",
-          "mpg",
-          "dmv",
-          "registration",
-          "used car",
-          "car specs",
-          "tag",
-          "decoder",
-          "title",
-          "safety rating",
-          "emissions",
-          "recall"
-        ],
-        "promoText": "Now with cleaner reports & faster plate scans. Decode any US plate — safety ratings, recalls, MPG & used cars near you. Plus full UK MOT history. No sign-up.",
         "supportUrl": "https://doc-hosting.flycricket.io/bango-terms-of-use/4440745d-df2e-450d-b28e-de507fb8e9ac/terms",
         "privacyPolicyUrl": "https://doc-hosting.flycricket.io/bango-privacy-policy/63c81027-bd95-4ec7-b15d-6a08fef0080a/privacy"
       }

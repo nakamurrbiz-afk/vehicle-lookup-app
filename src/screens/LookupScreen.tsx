@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TouchableOpacity, ScrollView, StyleSheet,
   ActivityIndicator, KeyboardAvoidingView, Platform,
@@ -6,7 +6,6 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Location from 'expo-location';
-import { CountrySelector, COUNTRIES } from '../components/CountrySelector';
 import { PlateInput } from '../components/PlateInput';
 import { VehicleCard } from '../components/VehicleCard';
 import { ErrorCard } from '../components/ErrorCard';
@@ -17,6 +16,9 @@ import { PlateGameScreen } from './PlateGameScreen';
 import { colors, spacing, radius, font } from '../theme';
 import { VehicleResult, fetchVehicleMedia } from '../api/vehicle';
 import { HistoryEntry } from '../hooks/useHistory';
+
+// Ban-go is a UK-only app: DVLA/DVSA are the free, official, deep data source.
+const COUNTRY = 'GB';
 
 interface Props {
   onOpenHistory: () => void;
@@ -70,64 +72,28 @@ function RecentCard({ entry, onPress }: { entry: HistoryEntry; onPress: () => vo
   );
 }
 
-const US_STATES = [
-  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA',
-  'HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
-  'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
-  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
-  'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY',
-  'DC',
-];
-
-const US_STATE_NAME_TO_CODE: Record<string, string> = {
-  'Alabama':'AL','Alaska':'AK','Arizona':'AZ','Arkansas':'AR','California':'CA',
-  'Colorado':'CO','Connecticut':'CT','Delaware':'DE','Florida':'FL','Georgia':'GA',
-  'Hawaii':'HI','Idaho':'ID','Illinois':'IL','Indiana':'IN','Iowa':'IA',
-  'Kansas':'KS','Kentucky':'KY','Louisiana':'LA','Maine':'ME','Maryland':'MD',
-  'Massachusetts':'MA','Michigan':'MI','Minnesota':'MN','Mississippi':'MS',
-  'Missouri':'MO','Montana':'MT','Nebraska':'NE','Nevada':'NV',
-  'New Hampshire':'NH','New Jersey':'NJ','New Mexico':'NM','New York':'NY',
-  'North Carolina':'NC','North Dakota':'ND','Ohio':'OH','Oklahoma':'OK',
-  'Oregon':'OR','Pennsylvania':'PA','Rhode Island':'RI','South Carolina':'SC',
-  'South Dakota':'SD','Tennessee':'TN','Texas':'TX','Utah':'UT','Vermont':'VT',
-  'Virginia':'VA','Washington':'WA','West Virginia':'WV','Wisconsin':'WI',
-  'Wyoming':'WY','District of Columbia':'DC',
-};
-
 export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
-  const [plate,       setPlate]       = useState('');
-  const [country,     setCountry]     = useState('GB');
-  const [usState,     setUsState]     = useState('CA');
-  const [postcode,    setPostcode]    = useState('');
-  const [locating,    setLocating]    = useState(false);
-  const [locMsg,      setLocMsg]      = useState<{ text: string; ok: boolean } | null>(null);
-  const [showScanner,      setShowScanner]      = useState(false);
-  const [showGame,         setShowGame]         = useState(false);
-  const [stateAutoDetected, setStateAutoDetected] = useState(false);
-  const [showStatePicker,  setShowStatePicker]  = useState(false);
+  const [plate,    setPlate]    = useState('');
+  const [postcode, setPostcode] = useState('');
+  const [locating, setLocating] = useState(false);
+  const [locMsg,   setLocMsg]   = useState<{ text: string; ok: boolean } | null>(null);
+  const [showScanner, setShowScanner] = useState(false);
+  const [showGame,    setShowGame]    = useState(false);
 
   const { state, lookup, reset } = useVehicleLookup();
   const { track } = useAnalytics();
-  const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     if (state.status === 'success') {
       onResult(state.data);
-      track({ name: 'search_success', props: { country, make: state.data.make ?? '', model: state.data.model ?? '' } });
+      track({ name: 'search_success', props: { country: COUNTRY, make: state.data.make ?? '', model: state.data.model ?? '' } });
     }
     if (state.status === 'error') {
-      track({ name: 'search_error', props: { country, error: state.error } });
+      track({ name: 'search_error', props: { country: COUNTRY, error: state.error } });
     }
   }, [state.status]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Scroll to reveal search button when US state row appears
-  useEffect(() => {
-    if (country === 'US') {
-      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 200);
-    }
-  }, [country]);
-
-  // Auto-detect on mount (silent)
+  // Auto-detect postcode on mount (silent) — country is always GB
   useEffect(() => {
     (async () => {
       try {
@@ -135,14 +101,6 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
         if (status !== 'granted') return;
         const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
         const [geo] = await Location.reverseGeocodeAsync(pos.coords);
-        if (geo?.isoCountryCode) {
-          const found = COUNTRIES.find(c => c.code === geo.isoCountryCode);
-          if (found) setCountry(found.code);
-          if (geo.isoCountryCode === 'US' && geo.region) {
-            const code = US_STATE_NAME_TO_CODE[geo.region];
-            if (code) { setUsState(code); setStateAutoDetected(true); }
-          }
-        }
         if (geo?.postalCode) {
           setPostcode(geo.postalCode);
           setLocMsg({ text: `Detected: ${geo.postalCode}`, ok: true });
@@ -153,15 +111,10 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
     })();
   }, []);
 
-  function handleCountryChange(code: string) {
-    track({ name: 'country_changed', props: { from: country, to: code } });
-    setCountry(code); setPlate(''); setPostcode(''); setLocMsg(null); reset();
-  }
-
   function handleSearch() {
     if (plate.trim().length >= 2) {
-      track({ name: 'search_initiated', props: { country, plate_length: plate.trim().length, has_postcode: postcode.trim().length > 0 } });
-      lookup(plate, country, country === 'US' ? usState : undefined);
+      track({ name: 'search_initiated', props: { country: COUNTRY, plate_length: plate.trim().length, has_postcode: postcode.trim().length > 0 } });
+      lookup(plate, COUNTRY);
     }
   }
 
@@ -176,20 +129,6 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const [geo] = await Location.reverseGeocodeAsync(pos.coords);
-
-      // Auto-set country if it's in our supported list
-      if (geo?.isoCountryCode) {
-        const found = COUNTRIES.find(c => c.code === geo.isoCountryCode);
-        if (found && found.code !== country) {
-          setCountry(found.code);
-          setPlate('');
-        }
-        if (geo.isoCountryCode === 'US' && geo.region) {
-          const code = US_STATE_NAME_TO_CODE[geo.region];
-          if (code) { setUsState(code); setStateAutoDetected(true); setShowStatePicker(false); }
-        }
-      }
-
       if (geo?.postalCode) {
         track({ name: 'location_detected', props: { success: true } });
         setPostcode(geo.postalCode);
@@ -206,23 +145,13 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
     }
   }
 
-  const currentCountry = COUNTRIES.find(c => c.code === country) ?? COUNTRIES[0];
-  const isUnavailable  = !currentCountry.available;
-  const canSearch      = plate.trim().length >= 2 && state.status !== 'loading' && !isUnavailable;
-
-  const pcPlaceholders: Record<string, string> = {
-    GB: 'Postcode (e.g. W1K 3JP)',
-    US: 'ZIP code (e.g. 10001)',
-    NL: 'Postcode (e.g. 1234 AB)',
-    JP: 'Postcode (e.g. 100-0001)',
-  };
+  const canSearch = plate.trim().length >= 2 && state.status !== 'loading';
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <StatusBar barStyle="light-content" backgroundColor={colors.bg} />
       <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
         <ScrollView
-          ref={scrollRef}
           style={styles.scroll}
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
@@ -232,52 +161,15 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Ban-go</Text>
-            <Text style={styles.subtitle}>Identify any vehicle from its number plate</Text>
+            <Text style={styles.subtitle}>UK number plate & MOT check</Text>
           </View>
 
           {/* Form card */}
           <View style={styles.card}>
 
             <View>
-              <Text style={styles.lbl}>Country</Text>
-              <CountrySelector selected={country} onChange={handleCountryChange} />
-            </View>
-
-            {country === 'US' && (
-              <View>
-                <View style={styles.stateLabelRow}>
-                  <Text style={styles.lbl}>State</Text>
-                  {stateAutoDetected && !showStatePicker && (
-                    <Text style={styles.stateAutoTxt}>auto-detected</Text>
-                  )}
-                </View>
-                <TouchableOpacity
-                  style={styles.stateBadge}
-                  onPress={() => setShowStatePicker(v => !v)}
-                  activeOpacity={0.75}
-                >
-                  <Text style={styles.stateBadgeCode}>{usState}</Text>
-                  <Text style={styles.stateBadgeArrow}>{showStatePicker ? '▲' : '▼'}</Text>
-                </TouchableOpacity>
-                {showStatePicker && (
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.stateScroll} contentContainerStyle={styles.stateRow}>
-                    {US_STATES.map(s => (
-                      <TouchableOpacity
-                        key={s}
-                        style={[styles.stateChip, usState === s && styles.stateChipActive]}
-                        onPress={() => { setUsState(s); setStateAutoDetected(false); setShowStatePicker(false); }}
-                      >
-                        <Text style={[styles.stateChipTxt, usState === s && styles.stateChipTxtActive]}>{s}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
-                )}
-              </View>
-            )}
-
-            <View>
               <View style={styles.plateHeader}>
-                <Text style={styles.lbl}>License Plate</Text>
+                <Text style={styles.lbl}>Number Plate</Text>
                 <TouchableOpacity
                   style={styles.scanBtn}
                   onPress={() => setShowScanner(true)}
@@ -286,7 +178,7 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
                   <Text style={styles.scanBtnTxt}>📷 Scan</Text>
                 </TouchableOpacity>
               </View>
-              <PlateInput value={plate} onChange={setPlate} country={country} />
+              <PlateInput value={plate} onChange={setPlate} country={COUNTRY} />
             </View>
 
             <View>
@@ -299,7 +191,7 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
                   style={styles.locInput}
                   value={postcode}
                   onChangeText={t => { setPostcode(t.toUpperCase()); setLocMsg(null); }}
-                  placeholder={pcPlaceholders[country] ?? 'Postcode'}
+                  placeholder="Postcode (e.g. W1K 3JP)"
                   placeholderTextColor={colors.t4}
                   autoCorrect={false}
                   maxLength={10}
@@ -322,15 +214,6 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
               )}
             </View>
 
-            {isUnavailable && (
-              <View style={styles.jpNotice}>
-                <Text style={styles.jpNoticeTxt}>
-                  {currentCountry.label} is currently under development and not yet available.{'\n'}
-                  Please check back soon for updates.
-                </Text>
-              </View>
-            )}
-
             <TouchableOpacity
               style={[styles.searchBtn, !canSearch && styles.searchBtnOff]}
               onPress={handleSearch}
@@ -340,7 +223,7 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
               {state.status === 'loading'
                 ? <ActivityIndicator color="#fff" />
                 : <Text style={[styles.searchBtnTxt, !canSearch && styles.searchBtnTxtOff]} adjustsFontSizeToFit numberOfLines={1}>
-                    {isUnavailable ? `${currentCountry.label} — Coming Soon` : 'Search Vehicle'}
+                    Search Vehicle
                   </Text>}
             </TouchableOpacity>
 
@@ -374,14 +257,9 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
                     entry={entry}
                     onPress={() => {
                       track({ name: 'recent_card_tapped', props: { country: entry.country } });
-                      setCountry(entry.country);
                       setPlate(entry.plate);
                       reset();
-                      setTimeout(() => lookup(
-                        entry.plate,
-                        entry.country,
-                        entry.country === 'US' ? usState : undefined,
-                      ), 50);
+                      setTimeout(() => lookup(entry.plate, entry.country), 50);
                     }}
                   />
                 ))}
@@ -415,7 +293,7 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
           )}
 
           {state.status === 'error' && (
-            <ErrorCard error={state.error} onRetry={() => lookup(plate, country, country === 'US' ? usState : undefined)} />
+            <ErrorCard error={state.error} onRetry={() => lookup(plate, COUNTRY)} />
           )}
 
         </ScrollView>
@@ -434,11 +312,11 @@ export function LookupScreen({ onOpenHistory, onResult, entries }: Props) {
 
       <ScannerScreen
         visible={showScanner}
-        country={country}
+        country={COUNTRY}
         onDetected={(scannedPlate) => {
           setPlate(scannedPlate);
           setShowScanner(false);
-          setTimeout(() => lookup(scannedPlate, country, country === 'US' ? usState : undefined), 150);
+          setTimeout(() => lookup(scannedPlate, COUNTRY), 150);
         }}
         onClose={() => setShowScanner(false)}
       />
@@ -464,8 +342,6 @@ const styles = StyleSheet.create({
   locStatus:    { fontSize: font.sizes.xs, marginTop: spacing.xs },
   locOk:        { color: colors.green },
   locErr:       { color: colors.red },
-  jpNotice:     { backgroundColor: 'rgba(255,255,255,0.05)', borderLeftWidth: 2, borderLeftColor: 'rgba(255,255,255,0.2)', borderRadius: radius.sm, padding: spacing.md },
-  jpNoticeTxt:  { fontSize: font.sizes.sm, color: colors.t2, lineHeight: 20 },
   searchBtn:    { height: 54, borderRadius: radius.full, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.blue, shadowColor: colors.blue, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.4, shadowRadius: 12, elevation: 6 },
   searchBtnOff: { backgroundColor: 'rgba(255,255,255,0.09)', shadowOpacity: 0, elevation: 0 },
   searchBtnTxt:    { color: '#fff', fontSize: font.sizes.lg, fontWeight: font.weights.bold },
@@ -479,17 +355,6 @@ const styles = StyleSheet.create({
   gameBtn:      { backgroundColor: 'rgba(252,211,77,0.12)', borderWidth: 1, borderColor: 'rgba(252,211,77,0.3)', borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: 5 },
   gameBtnTxt:   { fontSize: font.sizes.xs, fontWeight: font.weights.bold, color: colors.yellow, letterSpacing: 0.5 },
   clearTxt:     { fontSize: font.sizes.sm, color: colors.blue },
-  stateLabelRow:   { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  stateAutoTxt:    { fontSize: font.sizes.xs, color: colors.green, fontWeight: font.weights.semibold },
-  stateBadge:      { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, alignSelf: 'flex-start', paddingHorizontal: spacing.md, paddingVertical: 10, borderRadius: radius.md, borderWidth: 1, borderColor: colors.borderBlue, backgroundColor: colors.blueDim },
-  stateBadgeCode:  { fontSize: font.sizes.lg, fontWeight: font.weights.bold, color: colors.blue, letterSpacing: 1 },
-  stateBadgeArrow: { fontSize: font.sizes.xs, color: colors.t3 },
-  stateScroll:     { marginHorizontal: -spacing.xs, marginTop: spacing.sm },
-  stateRow:        { flexDirection: 'row', gap: spacing.xs, paddingHorizontal: spacing.xs },
-  stateChip:       { paddingHorizontal: spacing.sm, paddingVertical: 8, minHeight: 36, borderRadius: radius.full, borderWidth: 1, borderColor: colors.border, backgroundColor: 'rgba(255,255,255,0.05)', alignItems: 'center', justifyContent: 'center' },
-  stateChipActive: { backgroundColor: colors.blue, borderColor: colors.blue },
-  stateChipTxt:    { fontSize: font.sizes.xs, fontWeight: font.weights.semibold, color: colors.t3, letterSpacing: 0.5 },
-  stateChipTxtActive: { color: '#fff' },
 
   recentHeader:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
   seeAllTxt:     { fontSize: font.sizes.sm, color: colors.blue, fontWeight: font.weights.semibold },

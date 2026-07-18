@@ -18,7 +18,7 @@
       "icon": "./assets/icon.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSLocationWhenInUseUsageDescription": "Ban-go uses your location to automatically detect your country and postcode, so nearby used-car listings appear without manual input. For example, if you are in the United Kingdom, the app sets the country to GB and pre-fills your postcode (e.g. SW1A 2AA) so search results are sorted by proximity to you."
+        "NSLocationWhenInUseUsageDescription": "Ban-go uses your location to detect your postcode, so nearby used-car listings appear without typing it in. For example, it pre-fills a postcode like SW1A 2AA so results are sorted by how close they are to you."
       }
     },
     "android": {
@@ -37,7 +37,7 @@
       [
         "react-native-vision-camera",
         {
-          "cameraPermissionText": "Ban-go uses your camera to scan license plates automatically."
+          "cameraPermissionText": "Ban-go uses your camera to scan number plates automatically."
         }
       ]
     ],
