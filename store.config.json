@@ -28,6 +28,28 @@
         "supportUrl": "https://doc-hosting.flycricket.io/bango-terms-of-use/4440745d-df2e-450d-b28e-de507fb8e9ac/terms",
         "privacyPolicyUrl": "https://doc-hosting.flycricket.io/bango-privacy-policy/63c81027-bd95-4ec7-b15d-6a08fef0080a/privacy"
       },
+      "nl-NL": {
+        "title": "Ban-go: Kenteken Check",
+        "subtitle": "Auto-info, RDW & occasions",
+        "description": "🚗 Ken elke auto direct — alleen aan het kenteken.\n\nZie je een auto en wil je meer weten? Ban-go zet elk Nederlands kenteken in seconden om in een volledig voertuigprofiel, rechtstreeks uit de open data van de RDW. Geen account, geen abonnement.\n\n── WAT JE KRIJGT ──────────────────────────\n✓ Merk, model, bouwjaar & kleur\n✓ Brandstof, cilinderinhoud & CO₂-uitstoot\n✓ Veiligheidsscore (Euro NCAP)\n✓ Tweedehands auto's bij jou in de buurt\n\n── HANDIG VOOR ────────────────────────────\n• Een occasion controleren vóór je koopt\n• Snel \"welke auto is dat?\" beslechten\n• Checken of een auto klopt met de advertentie\n\n── ZO WERKT HET ───────────────────────────\n1. Vul het kenteken in — of scan het met je camera\n2. Krijg direct een volledig voertuigrapport\n\n── OFFICIËLE DATA ─────────────────────────\nNederlandse gegevens komen rechtstreeks uit de open data van de RDW.\n\nReis je naar het VK of de VS? Ban-go leest ook Britse en Amerikaanse kentekens, met APK-historie (VK) en veiligheidsscores en recalls (VS).\n\nBan-go is de snelste manier om elke auto op straat op te zoeken.",
+        "keywords": [
+          "voertuig",
+          "tweedehands",
+          "brandstof",
+          "uitstoot",
+          "merk",
+          "model",
+          "bouwjaar",
+          "opzoeken",
+          "autogegevens",
+          "apk",
+          "co2",
+          "kleur"
+        ],
+        "promoText": "Nieuw: schonere rapporten. Zoek elk Nederlands kenteken op — merk, model, brandstof, CO₂, veiligheid & occasions bij jou in de buurt. Uit RDW open data.",
+        "supportUrl": "https://doc-hosting.flycricket.io/bango-terms-of-use/4440745d-df2e-450d-b28e-de507fb8e9ac/terms",
+        "privacyPolicyUrl": "https://doc-hosting.flycricket.io/bango-privacy-policy/63c81027-bd95-4ec7-b15d-6a08fef0080a/privacy"
+      },
       "en-US": {
         "title": "Ban-go: License Plate Lookup",
         "subtitle": "VIN, Recalls & Vehicle Report",
